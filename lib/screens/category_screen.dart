@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:takos_korner/fakeData.dart/categories.dart';
 import 'package:takos_korner/screens/product_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/appbar.dart';

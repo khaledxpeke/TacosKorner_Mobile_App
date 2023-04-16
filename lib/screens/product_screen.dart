@@ -3,32 +3,35 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/dishCategories.dart';
+import 'package:takos_korner/screens/ingrediant_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/Error_popup.dart';
-
-// import '../fakeData.dart/categories.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../widgets/category.dart';
 import '../widgets/sideItem.dart';
 
 class ProductScreen extends StatefulWidget {
-  const ProductScreen({super.key});
+  const ProductScreen({Key? key}) : super(key: key);
+
   static const routeName = "/ProductScreen";
+
   @override
   State<ProductScreen> createState() => _ProductScreenState();
 }
 
 class _ProductScreenState extends State<ProductScreen> {
   int selectedProduct = -1;
+  late int selectedCategory;
   late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    selectedCategory =
+        Provider.of<Categories>(context, listen: false).selectedCategory;
   }
 
   @override
@@ -40,7 +43,6 @@ class _ProductScreenState extends State<ProductScreen> {
   @override
   Widget build(BuildContext context) {
     List<dynamic> categories = Provider.of<Categories>(context).categories;
-    int selectedCategory = Provider.of<Categories>(context).selectedCategory;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -71,11 +73,8 @@ class _ProductScreenState extends State<ProductScreen> {
                               categories[index]['name'],
                               () {
                                 setState(() {
-                                  if (selectedCategory == index) {
-                                    selectedCategory = -1;
-                                  } else {
-                                    selectedCategory = index;
-                                  }
+                                  selectedCategory = index;
+                                  selectedProduct = -1;
                                 });
                               },
                               index == selectedCategory,
@@ -103,7 +102,7 @@ class _ProductScreenState extends State<ProductScreen> {
                             height: 4.h,
                             width: 48.w,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(10),
                               color: primaryColor,
                             ),
                             child: Divider(),
@@ -164,23 +163,16 @@ class _ProductScreenState extends State<ProductScreen> {
         ),
       ),
       bottomSheet: bottomsheet(context, () {
-        if (selectedCategory == -1) {
+        if (selectedProduct == -1) {
           showDialog(
               context: context,
               builder: ((context) {
-                return ErrorMessage("Alert",
-                    "Il faut choisir votre catégorie préférée d'abord");
-              }));
-        } else if (selectedProduct == -1) {
-          showDialog(
-              context: context,
-              builder: ((context) {
-                return ErrorMessage("Alert",
-                    "Il faut choisir votre produit pour continuer");
+                return ErrorMessage(
+                    "Alert", "Il faut choisir votre produit pour continuer");
               }));
         } else {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ProductScreen()));
+              MaterialPageRoute(builder: (context) => IngrediantScreen()));
         }
       }),
     );
