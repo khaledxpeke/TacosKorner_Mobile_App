@@ -1,11 +1,11 @@
-// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, file_names
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/utils/colors.dart';
 
 class SideItem extends StatelessWidget {
-  final String image;
+  final String? image;
   final String name;
   final VoidCallback onTap;
   final bool selected;
@@ -33,8 +33,15 @@ class SideItem extends StatelessWidget {
         child: Column(children: [
           SizedBox(height: 4.h),
           Expanded(
-            child: Image.network(
-              image,
+            child: image == ""
+                ? Container()
+                : image!.startsWith("assets/images/")
+                    ? Image.asset(
+                        image!,
+                        fit: BoxFit.cover,
+                      )
+                    :Image.network(
+              image!,
               fit: BoxFit.cover,
             ),
           ),

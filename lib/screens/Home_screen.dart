@@ -1,9 +1,12 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, file_names
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:takos_korner/screens/category_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
+
+import '../provider/categoriesProvider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -40,6 +43,8 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      Provider.of<Categories>(context, listen: false)
+                          .setFormule("Sur place");
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -81,6 +86,8 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(width: 38.w),
                   GestureDetector(
                     onTap: () {
+                      Provider.of<Categories>(context, listen: false)
+                          .setFormule("Importer");
                       Navigator.push(
                           context,
                           MaterialPageRoute(

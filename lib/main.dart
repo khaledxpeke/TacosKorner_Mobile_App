@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:takos_korner/provider/dishCategories.dart';
+import 'package:takos_korner/provider/dessertProvider.dart';
+import 'package:takos_korner/provider/categoriesProvider.dart';
+import 'package:takos_korner/provider/sauceProvider.dart';
 import 'screens/Home_screen.dart';
 import 'screens/category_screen.dart';
 
@@ -12,6 +14,8 @@ void main()  async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => Categories()),
+      ChangeNotifierProvider(create: (_) => Deserts()),
+      ChangeNotifierProvider(create: (_) => Sauces()),
     ],
     child: MyApp(),
   ));

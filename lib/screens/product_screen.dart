@@ -2,11 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:takos_korner/provider/dishCategories.dart';
-import 'package:takos_korner/screens/ingrediant_screen.dart';
+import 'package:takos_korner/provider/categoriesProvider.dart';
+import 'package:takos_korner/screens/sauce_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/Error_popup.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:takos_korner/widgets/topSide.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
 import '../widgets/category.dart';
@@ -90,68 +91,63 @@ class _ProductScreenState extends State<ProductScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            categories[selectedCategory]['name'],
-                            style: TextStyle(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.w800,
-                                color: textColor),
-                          ),
-                          SizedBox(height: 8.h),
-                          Container(
-                            height: 4.h,
-                            width: 48.w,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: primaryColor,
-                            ),
-                            child: Divider(),
-                          ),
-                          SizedBox(height: 25.h),
+                          TopSide(categories[selectedCategory]['name'], 0, ""),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
                               child: Padding(
                                 padding: EdgeInsets.only(bottom: 95.h),
-                                child: GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: categories[selectedCategory]
-                                          ['products']
-                                      .length,
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    mainAxisSpacing: 10.h,
-                                    crossAxisSpacing: 23.w,
-                                  ),
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return CategoryItem(
-                                      categories[selectedCategory]['products']
-                                          [index]['image'],
-                                      categories[selectedCategory]['products']
-                                          [index]['name'],
-                                      categories[selectedCategory]['products']
-                                          [index]['price'],
-                                      categories[selectedCategory]['products']
-                                          [index]['currency'],
-                                      () {
-                                        setState(() {
-                                          if (selectedProduct == index) {
-                                            selectedProduct = -1;
-                                          } else {
-                                            selectedProduct = index;
-                                          }
-                                        });
-                                      },
-                                      index == selectedProduct,
-                                    );
-                                  },
-                                ),
+                                child: categories[selectedCategory]['products']
+                                        .isEmpty
+                                    ? Center(
+                                        child: Text(
+                                          "Il n'y a aucun produit dans cette catégorie pour le moment, nous sommes désolés.",
+                                          style: TextStyle(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w800,
+                                              color: redColor),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      )
+                                    : GridView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: categories[selectedCategory]
+                                                ['products']
+                                            .length,
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3,
+                                          mainAxisSpacing: 10.h,
+                                          crossAxisSpacing: 23.w,
+                                        ),
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return CategoryItem(
+                                            categories[selectedCategory]
+                                                ['products'][index]['image'],
+                                            categories[selectedCategory]
+                                                ['products'][index]['name'],
+                                            categories[selectedCategory]
+                                                ['products'][index]['price'],
+                                            categories[selectedCategory]
+                                                ['products'][index]['currency'],
+                                            () {
+                                              setState(() {
+                                                if (selectedProduct == index) {
+                                                  selectedProduct = -1;
+                                                } else {
+                                                  selectedProduct = index;
+                                                }
+                                              });
+                                            },
+                                            index == selectedProduct,
+                                          );
+                                        },
+                                      ),
                               ),
                             ),
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -171,9 +167,13 @@ class _ProductScreenState extends State<ProductScreen> {
                     "Alert", "Il faut choisir votre produit pour continuer");
               }));
         } else {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => IngrediantScreen()));
+          Provider.of<Categories>(context, listen: false).setCategory(
+              categories[selectedCategory]['products'][selectedProduct]);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => SauceScreen()));
         }
+      }, () {
+        Navigator.of(context).pop();
       }),
     );
   }

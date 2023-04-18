@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/utils/colors.dart';
 
 class CategoryItem extends StatelessWidget {
-  final String image;
+  final String? image;
   final String name;
   final double? price;
   final String? currency;
@@ -34,10 +34,17 @@ class CategoryItem extends StatelessWidget {
         child: Column(children: [
           SizedBox(height: 10.h),
           Expanded(
-            child: Image.network(
-              image,
-              fit: BoxFit.cover,
-            ),
+            child: image == ""
+                ? Container()
+                : image!.startsWith("assets/images/")
+                    ? Image.asset(
+                        image!,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.network(
+                        image!,
+                        fit: BoxFit.cover,
+                      ),
           ),
           SizedBox(height: 12.h),
           Text(
@@ -50,19 +57,12 @@ class CategoryItem extends StatelessWidget {
           price != null
               ? Padding(
                   padding: EdgeInsets.only(top: 3.h),
-                  child: RichText(
-                    text: TextSpan(
-                      text: "$price ",
-                      children: [
-                        TextSpan(
-                          text: currency,
-                        )
-                      ],
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 9.sp,
-                          color: selected ? lightColor : primaryColor),
-                    ),
+                  child: Text(
+                    "$price $currency",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 9.sp,
+                        color: selected ? lightColor : primaryColor),
                   ),
                 )
               : Container(),

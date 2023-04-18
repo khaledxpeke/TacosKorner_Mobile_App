@@ -9,7 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/bottomsheet.dart';
 import 'package:takos_korner/widgets/category.dart';
 
-import '../provider/dishCategories.dart';
+import '../provider/categoriesProvider.dart';
 import '../widgets/Error_popup.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -77,7 +77,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             crossAxisSpacing: 23.w,
                           ),
                           itemBuilder: (BuildContext context, int index) {
-                            List<dynamic> categories = context.watch<Categories>().categories;
+                            List<dynamic> categories =
+                                context.watch<Categories>().categories;
                             return CategoryItem(
                               categories[index]['image'],
                               categories[index]['name'],
@@ -116,6 +117,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => ProductScreen()));
         }
+      }, () {
+        Navigator.of(context).pop();
       }),
     );
   }

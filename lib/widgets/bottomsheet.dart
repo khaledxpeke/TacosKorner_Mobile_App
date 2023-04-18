@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/utils/colors.dart';
 
-Widget bottomsheet(BuildContext context,VoidCallback onPressed) {
+Widget bottomsheet(BuildContext context,VoidCallback onNext,VoidCallback onRetour) {
   return Container(
     height: 85.h,
     decoration: BoxDecoration(
@@ -19,9 +19,7 @@ Widget bottomsheet(BuildContext context,VoidCallback onPressed) {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: onRetour,
               child: Text(
                 "RETOUR",
                 style: TextStyle(
@@ -43,7 +41,7 @@ Widget bottomsheet(BuildContext context,VoidCallback onPressed) {
                     ),
                   ))),
           TextButton(
-              onPressed: onPressed,
+              onPressed: onNext,
               child: Text(
                 "SUIVANT",
                 style: TextStyle(
