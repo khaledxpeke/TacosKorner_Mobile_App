@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/dessertProvider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
 import 'package:takos_korner/provider/sauceProvider.dart';
+import 'package:takos_korner/screens/splash_screen.dart';
 import 'screens/Home_screen.dart';
 import 'screens/category_screen.dart';
 
@@ -37,9 +38,10 @@ class MyApp extends StatelessWidget {
               //   textTheme:
               //       GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
             ),
-            home: HomeScreen(),
+            home: SplashScreen(),
             routes: {
               CategoryScreen.routeName: (ctx) => CategoryScreen(),
+              HomeScreen.routeName: (ctx) => HomeScreen(),
             },
           );
         });

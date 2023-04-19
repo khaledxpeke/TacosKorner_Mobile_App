@@ -18,6 +18,7 @@ import '../widgets/sideItem.dart';
 
 class PackageScreen extends StatefulWidget {
   const PackageScreen({super.key});
+  static const routeName = "/PackageScreen";
 
   @override
   State<PackageScreen> createState() => _PackageScreenState();

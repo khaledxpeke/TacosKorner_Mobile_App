@@ -4,6 +4,7 @@ import 'package:takos_korner/utils/colors.dart';
 
 class PaiementScreen extends StatelessWidget {
   const PaiementScreen({super.key});
+  static const routeName = "/PaiementScreen";
 
   @override
   Widget build(BuildContext context) {

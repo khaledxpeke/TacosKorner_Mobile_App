@@ -9,7 +9,9 @@ import 'package:takos_korner/utils/colors.dart';
 import '../provider/categoriesProvider.dart';
 
 class HomeScreen extends StatelessWidget {
+
   const HomeScreen({super.key});
+  static const routeName = "/HomeScreen";
 
   @override
   Widget build(BuildContext context) {

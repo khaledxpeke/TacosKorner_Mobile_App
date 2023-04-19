@@ -13,6 +13,7 @@ import '../provider/categoriesProvider.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   const ConfirmationScreen({super.key});
+  static const routeName = "/ConfirmationScreen";
 
   @override
   Widget build(BuildContext context) {
