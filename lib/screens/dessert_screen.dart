@@ -113,7 +113,7 @@ class _DessertScreenState extends State<DessertScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TopSide(category['name'], 2,
+                          TopSide(category['name'], 3,
                               "Oh il vous manque que le dessert!"),
                           _isLoading
                               ? Center(

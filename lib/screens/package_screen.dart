@@ -139,7 +139,7 @@ class _PackageScreenState extends State<PackageScreen> {
                                   }, selectedPackage['_id'] == 1),
                                   SizedBox(width: 15.w),
                                   CategoryItem("assets/images/fries.png",
-                                      "FRITE", 0.5, "DT", () {
+                                      "FRITE", 1.0, "DT", () {
                                     if (selectedPackage['_id'] == 2) {
                                       setState(() {
                                         sauce.remove(selectedPackage);

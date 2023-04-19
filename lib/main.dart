@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/dessertProvider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
@@ -9,7 +10,7 @@ import 'package:takos_korner/provider/sauceProvider.dart';
 import 'screens/Home_screen.dart';
 import 'screens/category_screen.dart';
 
-void main()  async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MultiProvider(
     providers: [
@@ -29,11 +30,13 @@ class MyApp extends StatelessWidget {
         designSize: const Size(396, 642),
         builder: (context, child) {
           return MaterialApp(
-            title: 'Takos Korner',
+            title: 'Tacos Korner',
             debugShowCheckedModeBanner: false,
-            // theme: ThemeData(
-            //   textTheme: GoogleFonts.interTextTheme(),
-            // ),
+            theme: ThemeData(
+              fontFamily: 'Inter'
+              //   textTheme:
+              //       GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+            ),
             home: HomeScreen(),
             routes: {
               CategoryScreen.routeName: (ctx) => CategoryScreen(),

@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:takos_korner/screens/category_screen.dart';
+import 'package:takos_korner/screens/paiement_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/appbar.dart';
 import 'package:takos_korner/widgets/confirmationButton.dart';
@@ -54,10 +56,19 @@ class ConfirmationScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ConfirmationButton(
-                        lightColor, greenColor, 'Valider', () {}),
+                    ConfirmationButton(lightColor, greenColor, 'Valider', () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PaiementScreen()));
+                    }),
                     SizedBox(width: 19.w),
-                    ConfirmationButton(lightColor, redColor, 'Catégoris', () {})
+                    ConfirmationButton(lightColor, redColor, 'Catégoris', () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CategoryScreen()));
+                    })
                   ],
                 ),
                 SizedBox(height: 8.h),
