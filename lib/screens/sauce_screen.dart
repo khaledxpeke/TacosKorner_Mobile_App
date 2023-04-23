@@ -8,6 +8,7 @@ import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/totalAndItems.dart';
 import '../provider/sauceProvider.dart';
+import '../widgets/Error_popup.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
 import '../widgets/category.dart';
@@ -26,6 +27,7 @@ class SauceScreen extends StatefulWidget {
 class _SauceScreenState extends State<SauceScreen> {
   List<dynamic> sauce = [];
   double total = 0;
+  double nbSauces = 0;
   late ScrollController _scrollController;
   bool _isLoading = true;
 
@@ -148,13 +150,25 @@ class _SauceScreenState extends State<SauceScreen> {
                                             setState(() {
                                               if (sauce
                                                   .contains(sauceData[index])) {
+                                                nbSauces -= 1;
                                                 total -=
                                                     sauceData[index]['price'];
                                                 sauce.remove(sauceData[index]);
                                               } else {
-                                                total +=
-                                                    sauceData[index]['price'];
-                                                sauce.add(sauceData[index]);
+                                                if (nbSauces < 2) {
+                                                  nbSauces += 1;
+                                                  total +=
+                                                      sauceData[index]['price'];
+                                                  sauce.add(sauceData[index]);
+                                                } else {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: ((context) {
+                                                        return ErrorMessage(
+                                                            "Alert",
+                                                            "Il faut choisir que 2 sauces au maximum");
+                                                      }));
+                                                }
                                               }
                                             });
                                           }, sauce.contains(sauceData[index]));
@@ -175,11 +189,13 @@ class _SauceScreenState extends State<SauceScreen> {
       ),
       bottomSheet: bottomsheet(context, () {
         Provider.of<Sauces>(context, listen: false).setSauce(sauce);
-        Provider.of<Categories>(context, listen: false).setTotal(total+category['price']);
+        Provider.of<Categories>(context, listen: false)
+            .setTotal(total + category['price']);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => PackageScreen()));
       }, () {
-        Provider.of<Categories>(context, listen: false).setTotal(total-category['price']);
+        Provider.of<Categories>(context, listen: false)
+            .setTotal(total - category['price']);
         Navigator.of(context).pop();
       }),
     );
