@@ -3,11 +3,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/screens/sauce_screen.dart';
+import 'package:takos_korner/provider/suppelementsProvider.dart';
+import 'package:takos_korner/screens/ingrediant_screen.dart';
+import 'package:takos_korner/screens/package_screen.dart';
+import 'package:takos_korner/screens/supplements_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/Error_popup.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/topSide.dart';
+import '../provider/ingrediantProvider.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
 import '../widgets/category.dart';
@@ -91,7 +95,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TopSide(categories[selectedCategory]['name'], 0, ""),
+                          TopSide(categories[selectedCategory]['name'], Provider.of<Categories>(context, listen: false).stepIndex, ""),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -140,6 +144,27 @@ class _ProductScreenState extends State<ProductScreen> {
                                                   selectedProduct = index;
                                                 }
                                               });
+                                              int nbSteps = (4 +
+                                                      (categories[selectedCategory]
+                                                                          ['products']
+                                                                      [index][
+                                                                  'supplements']
+                                                              .isEmpty
+                                                          ? 0
+                                                          : 1) +
+                                                      (categories[selectedCategory]
+                                                                      ['products'][
+                                                                  index]['type']
+                                                              .isEmpty
+                                                          ? 0
+                                                          : categories[selectedCategory]
+                                                                      ['products']
+                                                                  [index]['type']
+                                                              .length))
+                                                  .toInt();
+                                              Provider.of<Categories>(context,
+                                                      listen: false)
+                                                  .setNbSteps(nbSteps);
                                             },
                                             index == selectedProduct,
                                           );
@@ -167,10 +192,37 @@ class _ProductScreenState extends State<ProductScreen> {
                     "Alert", "Il faut choisir votre produit pour continuer");
               }));
         } else {
+          List<dynamic> type =
+              categories[selectedCategory]['products'][selectedProduct]['type'];
+          List<dynamic> supplements = categories[selectedCategory]['products']
+              [selectedProduct]['supplements'];
           Provider.of<Categories>(context, listen: false).setCategory(
               categories[selectedCategory]['products'][selectedProduct]);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => SauceScreen()));
+          Provider.of<Categories>(context, listen: false).setTotal(
+              categories[selectedCategory]['products'][selectedProduct]
+                  ['price']);
+          if (type.isNotEmpty) {
+            Provider.of<Ingredients>(context, listen: false).setTypes(type);
+            Provider.of<Ingredients>(context, listen: false)
+                .setType(type[0]['name'], 0);
+            Provider.of<Ingredients>(context, listen: false).setIngrediants(
+                categories[selectedCategory]['products'][selectedProduct]
+                    ['ingrediants']);
+            if (supplements.isNotEmpty) {
+              Provider.of<Supplements>(context, listen: false)
+                  .setSupplements(supplements);
+            }
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => IngrediantScreen()));
+          } else if (supplements.isNotEmpty) {
+            Provider.of<Supplements>(context, listen: false)
+                .setSupplements(supplements);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SupplementsScreen()));
+          } else {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PackageScreen()));
+          }
         }
       }, () {
         Navigator.of(context).pop();

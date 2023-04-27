@@ -2,8 +2,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/orderStepper.dart';
+
+import '../provider/categoriesProvider.dart';
 
 class TopSide extends StatelessWidget {
   String name;
@@ -22,7 +25,7 @@ class TopSide extends StatelessWidget {
               fontSize: 20.sp, fontWeight: FontWeight.w800, color: textColor),
         ),
         SizedBox(height: 2.h),
-        OrderStepper(stepperIndex),
+        OrderStepper(stepperIndex, Provider.of<Categories>(context).nbSteps),
         message != "" ? SizedBox(height: 8.h) : Container(),
         message != ""
             ? Text(

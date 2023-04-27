@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/dessertProvider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/provider/sauceProvider.dart';
+import 'package:takos_korner/provider/ingrediantProvider.dart';
 import 'package:takos_korner/screens/confiramtion_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,7 +53,8 @@ class _DessertScreenState extends State<DessertScreen> {
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
     // total = Provider.of<Categories>(context).total;
-    List<dynamic> sauce = Provider.of<Sauces>(context).sauce;
+    List<dynamic> selectedIngrediants =
+        Provider.of<Ingredients>(context).selectedIngrediants;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -84,11 +85,15 @@ class _DessertScreenState extends State<DessertScreen> {
                             child: ListView.builder(
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: sauce.length,
+                              itemCount: selectedIngrediants.length,
                               itemBuilder: (BuildContext context, int index) {
+                                if (selectedIngrediants[index]['name'] ==
+                                    "seul") {
+                                  return Container();
+                                }
                                 return SideItem(
-                                  sauce[index]['image'],
-                                  sauce[index]['name'],
+                                  selectedIngrediants[index]['image'],
+                                  selectedIngrediants[index]['name'],
                                   () {},
                                   false,
                                 );
@@ -101,7 +106,7 @@ class _DessertScreenState extends State<DessertScreen> {
                           double.parse(
                               (total + Provider.of<Categories>(context).total)
                                   .toStringAsFixed(2)),
-                          sauce.length),
+                          selectedIngrediants.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -150,18 +155,22 @@ class _DessertScreenState extends State<DessertScreen> {
                                               desertData[index]['currency'],
                                               () {
                                             setState(() {
-                                              if (sauce.contains(
+                                              if (selectedIngrediants.contains(
                                                   desertData[index])) {
                                                 total -=
                                                     desertData[index]['price'];
-                                                sauce.remove(desertData[index]);
+                                                selectedIngrediants
+                                                    .remove(desertData[index]);
                                               } else {
                                                 total +=
                                                     desertData[index]['price'];
-                                                sauce.add(desertData[index]);
+                                                selectedIngrediants
+                                                    .add(desertData[index]);
                                               }
                                             });
-                                          }, sauce.contains(desertData[index]));
+                                          },
+                                              selectedIngrediants
+                                                  .contains(desertData[index]));
                                         },
                                       ),
                                     ),
@@ -178,7 +187,8 @@ class _DessertScreenState extends State<DessertScreen> {
         ),
       ),
       bottomSheet: bottomsheet(context, () {
-        Provider.of<Deserts>(context, listen: false).setDessert(sauce);
+        Provider.of<Deserts>(context, listen: false)
+            .setDessert(selectedIngrediants);
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => ConfirmationScreen()));
       }, () {

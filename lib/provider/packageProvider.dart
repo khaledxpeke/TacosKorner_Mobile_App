@@ -6,17 +6,16 @@ import 'package:http/http.dart' as http;
 
 import '../models/http_exceptions.dart';
 
-class Sauces with ChangeNotifier {
-  List<dynamic> sauces = [];
-  List<dynamic> sauce = [];
+class Package with ChangeNotifier {
+  List<dynamic> packages = [];
 
   final url = Uri.parse("http://192.168.1.24:3000/api");
 
-  Future<void> getSauces() async {
+  Future<void> getPackage() async {
     try {
-      final response = await http.get(Uri.parse("$url/desert"));
+      final response = await http.get(Uri.parse("$url/pack"));
       if (response.statusCode == 200) {
-        sauces = json.decode(response.body);
+        packages = json.decode(response.body);
         notifyListeners();
       } else {
         throw HttpException(
@@ -28,8 +27,8 @@ class Sauces with ChangeNotifier {
     }
   }
 
-  setSauce(List<dynamic> sauce1) {
-    sauce = sauce1;
+  setDessert(List<dynamic> packages1) {
+    packages = packages1;
     notifyListeners();
   }
 }

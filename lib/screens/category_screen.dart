@@ -22,6 +22,7 @@ class CategoryScreen extends StatefulWidget {
 class _CategoryScreenState extends State<CategoryScreen> {
   int selectedCategory = -1;
   bool _isLoading = true;
+  List<dynamic> categories = [];
 
   @override
   void initState() {
@@ -77,8 +78,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             crossAxisSpacing: 23.w,
                           ),
                           itemBuilder: (BuildContext context, int index) {
-                            List<dynamic> categories =
-                                context.watch<Categories>().categories;
+                            categories = context.watch<Categories>().categories;
                             return CategoryItem(
                               categories[index]['image'],
                               categories[index]['name'],

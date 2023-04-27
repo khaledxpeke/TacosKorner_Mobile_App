@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/provider/sauceProvider.dart';
+import 'package:takos_korner/provider/ingrediantProvider.dart';
+import 'package:takos_korner/provider/packageProvider.dart';
 import 'package:takos_korner/screens/dessert_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/bottomsheet.dart';
@@ -27,18 +28,29 @@ class PackageScreen extends StatefulWidget {
 class _PackageScreenState extends State<PackageScreen> {
   Map<String, dynamic> selectedPackage = {};
   late ScrollController _scrollController;
+  double total = 0;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    loadData();
+  }
+
+  void loadData() async {
+    await context.read<Package>().getPackage();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    List<dynamic> sauce = Provider.of<Sauces>(context).sauce;
-    double total = Provider.of<Categories>(context).total;
+    List<dynamic> ingrediants =
+        Provider.of<Ingredients>(context).selectedIngrediants;
+    int nbSteps = ((category['supplements'].isEmpty?0:1)+(category['type'].isEmpty?0:category['type'].length)+2).toInt();
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -69,11 +81,11 @@ class _PackageScreenState extends State<PackageScreen> {
                             child: ListView.builder(
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: sauce.length,
+                              itemCount: ingrediants.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return SideItem(
-                                  sauce[index]['image'],
-                                  sauce[index]['name'],
+                                  ingrediants[index]['image'],
+                                  ingrediants[index]['name'],
                                   () {},
                                   false,
                                 );
@@ -83,12 +95,13 @@ class _PackageScreenState extends State<PackageScreen> {
                         ),
                       ),
                       TotalAndItems(
-                          double.parse((total +
+                          double.parse((category['price'] +
+                                  total +
                                   (selectedPackage != {}
                                       ? selectedPackage['price'] ?? 0.0
                                       : 0.0))
                               .toStringAsFixed(2)),
-                          sauce.length),
+                          ingrediants.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -99,96 +112,91 @@ class _PackageScreenState extends State<PackageScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 8.w),
                       child: Column(
                         children: [
-                          TopSide(category['name'], 2, ""),
+                          TopSide(category['name'], nbSteps, ""),
                           SizedBox(height: 100.h),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Je choisi ma formule",
-                                style: TextStyle(
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w800,
-                                    color: textColor),
-                              ),
-                              SizedBox(height: 20.h),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CategoryItem("assets/images/pepsi.png",
-                                      "Menu", 2.5, 'DT', () {
-                                    if (selectedPackage['_id'] == 1) {
-                                      setState(() {
-                                        sauce.remove(selectedPackage);
-                                        selectedPackage = {};
-                                      });
-                                    } else {
-                                      if (sauce.contains(selectedPackage)) {
-                                        sauce.remove(selectedPackage);
-                                      }
-                                      setState(() {
-                                        selectedPackage = {
-                                          '_id': 1,
-                                          'name': 'Menu',
-                                          'image': 'assets/images/pepsi.png',
-                                          'price': 2.5,
-                                          'currency': 'DT'
-                                        };
-                                        sauce.add(selectedPackage);
-                                      });
-                                    }
-                                  }, selectedPackage['_id'] == 1),
-                                  SizedBox(width: 15.w),
-                                  CategoryItem("assets/images/fries.png",
-                                      "FRITE", 1.0, "DT", () {
-                                    if (selectedPackage['_id'] == 2) {
-                                      setState(() {
-                                        sauce.remove(selectedPackage);
-                                        selectedPackage = {};
-                                      });
-                                    } else {
-                                      if (sauce.contains(selectedPackage)) {
-                                        sauce.remove(selectedPackage);
-                                      }
-                                      setState(() {
-                                        selectedPackage = {
-                                          '_id': 2,
-                                          'image': 'assets/images/fries.png',
-                                          'name': 'FRITE',
-                                          'price': 1,
-                                          'currency': 'DT'
-                                        };
-                                        sauce.add(selectedPackage);
-                                      });
-                                    }
-                                  }, selectedPackage['_id'] == 2),
-                                  SizedBox(width: 15.w),
-                                  CategoryItem("", "SEUL", null, null, () {
-                                    if (selectedPackage['_id'] == 3) {
-                                      setState(() {
-                                        sauce.remove(selectedPackage);
-                                        selectedPackage = {};
-                                      });
-                                    } else {
-                                      if (sauce.contains(selectedPackage)) {
-                                        sauce.remove(selectedPackage);
-                                      }
-                                      setState(() {
-                                        selectedPackage = {
-                                          '_id': 3,
-                                          'name': 'SEUL',
-                                          'image': '',
-                                          'price': null,
-                                          'currency': null
-                                        };
-                                        sauce.add(selectedPackage);
-                                      });
-                                    }
-                                  }, selectedPackage['_id'] == 3)
-                                ],
-                              )
-                            ],
-                          )
+                          _isLoading
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    color: primaryColor,
+                                  ),
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Je choisi ma formule",
+                                      style: TextStyle(
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w800,
+                                          color: textColor),
+                                    ),
+                                    SizedBox(height: 20.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: context
+                                          .watch<Package>()
+                                          .packages
+                                          .map((package) => Row(
+                                                children: [
+                                                  CategoryItem(
+                                                      package['name'] == "seul"
+                                                          ? ""
+                                                          : package['image'],
+                                                      package['name'],
+                                                      package['price'] == 0
+                                                          ? null
+                                                          : package['price'],
+                                                      package['price'] == 0
+                                                          ? null
+                                                          : package['currency'],
+                                                      () {
+                                                    if (ingrediants
+                                                        .contains(
+                                                            selectedPackage)) {
+                                                      total -= selectedPackage[
+                                                                  'price'] ==
+                                                              0
+                                                          ? 0.0
+                                                          : selectedPackage[
+                                                              'price'];
+                                                      ingrediants
+                                                          .remove(
+                                                              selectedPackage);
+                                                      setState(() {
+                                                        selectedPackage = {};
+                                                      });
+                                                    } else {
+                                                      total +=
+                                                          package['price'] == 0
+                                                              ? 0.0
+                                                              : package[
+                                                                  'price'];
+                                                      ingrediants
+                                                          .add(package);
+                                                      setState(() {
+                                                        selectedPackage =
+                                                            package;
+                                                      });
+                                                    }
+                                                  },
+                                                      ingrediants
+                                                          .contains(package)),
+                                                  context
+                                                              .watch<Package>()
+                                                              .packages
+                                                              .last ==
+                                                          true
+                                                      ? Container()
+                                                      : SizedBox(
+                                                          width: 15.w,
+                                                        )
+                                                ],
+                                              ))
+                                          .toList(),
+                                    )
+                                  ],
+                                )
                         ],
                       ),
                     ),
@@ -208,7 +216,8 @@ class _PackageScreenState extends State<PackageScreen> {
                     "Alert", "Veuillez sélectionner une formule");
               }));
         } else {
-          Provider.of<Sauces>(context, listen: false).setSauce(sauce);
+          Provider.of<Ingredients>(context, listen: false)
+              .setSelectedIngrediants(ingrediants);
           Provider.of<Categories>(context, listen: false)
               .setTotal(total + selectedPackage['price']);
           Navigator.push(context,
@@ -218,8 +227,8 @@ class _PackageScreenState extends State<PackageScreen> {
         Provider.of<Categories>(context, listen: false).setTotal(total -
             (selectedPackage != {} ? selectedPackage['price'] ?? 0.0 : 0.0));
         setState(() {
-          if (sauce.contains(selectedPackage)) {
-            sauce.remove(selectedPackage);
+          if (ingrediants.contains(selectedPackage)) {
+            ingrediants.remove(selectedPackage);
           }
           selectedPackage = {};
         });

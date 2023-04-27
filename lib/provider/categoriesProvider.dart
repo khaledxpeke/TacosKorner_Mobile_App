@@ -14,7 +14,8 @@ class Categories with ChangeNotifier {
   String package = "";
   double total = 0;
   int items = 0;
-  int steps = 0;
+  int nbSteps = 4;
+  int stepIndex = 0;
 
   final url = Uri.parse("http://192.168.1.24:3000/api");
 
@@ -61,6 +62,11 @@ class Categories with ChangeNotifier {
 
   setItems(int items1) {
     items = items1;
+    notifyListeners();
+  }
+
+  setNbSteps(int nbSteps1) {
+    nbSteps = nbSteps1;
     notifyListeners();
   }
 }

@@ -5,12 +5,12 @@ import 'package:takos_korner/utils/colors.dart';
 
 class OrderStepper extends StatelessWidget {
   final int currentIndex;
+  final int nbSteps;
 
-  const OrderStepper(this.currentIndex);
+  const OrderStepper(this.currentIndex,this.nbSteps);
 
   @override
   Widget build(BuildContext context) {
-    int nbSteps = 5;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         double lineWidth = constraints.maxWidth / nbSteps;
