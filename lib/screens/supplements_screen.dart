@@ -26,6 +26,8 @@ class SupplementsScreen extends StatefulWidget {
 
 class _SupplementsScreenState extends State<SupplementsScreen> {
   late ScrollController _scrollController;
+  List<dynamic> selectedIngrediants = [];
+  double suppTotal = 0;
 
   @override
   void initState() {
@@ -42,8 +44,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    List<dynamic> ingrediants =
-        Provider.of<Ingredients>(context).selectedIngrediants;
+    selectedIngrediants = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     return Scaffold(
       backgroundColor: lightColor,
@@ -75,11 +76,11 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                             child: ListView.builder(
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: ingrediants.length,
+                              itemCount: selectedIngrediants.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return SideItem(
-                                  ingrediants[index]['image'],
-                                  ingrediants[index]['name'],
+                                  selectedIngrediants[index]['image'],
+                                  selectedIngrediants[index]['name'],
                                   () {},
                                   false,
                                 );
@@ -88,7 +89,8 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(total, ingrediants.length),
+                      TotalAndItems(
+                          total + suppTotal, selectedIngrediants.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -100,7 +102,11 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TopSide(category['name'], category['type'].isEmpty?1:category['type'].length+1,
+                          TopSide(
+                              category['name'],
+                              category['type'].isEmpty
+                                  ? 1
+                                  : category['type'].length + 1,
                               "Je choisir mes supplements"),
                           Expanded(
                             child: SingleChildScrollView(
@@ -133,23 +139,23 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                         selectedSupplementsData[index]
                                             ['currency'], () {
                                       setState(() {
-                                        if (ingrediants.contains(
+                                        if (selectedIngrediants.contains(
                                             selectedSupplementsData[index])) {
-                                          total -=
+                                          suppTotal -=
                                               selectedSupplementsData[index]
                                                   ['price'];
-                                          ingrediants.remove(
+                                          selectedIngrediants.remove(
                                               selectedSupplementsData[index]);
                                         } else {
-                                          total +=
+                                          suppTotal +=
                                               selectedSupplementsData[index]
                                                   ['price'];
-                                          ingrediants.add(
+                                          selectedIngrediants.add(
                                               selectedSupplementsData[index]);
                                         }
                                       });
                                     },
-                                        ingrediants.contains(
+                                        selectedIngrediants.contains(
                                             selectedSupplementsData[index]));
                                   },
                                 ),
@@ -168,12 +174,14 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
       ),
       bottomSheet: bottomsheet(context, () {
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(ingrediants);
-        // Provider.of<Categories>(context, listen: false).setTotal(total);
+            .setSelectedIngrediants(selectedIngrediants);
+        Provider.of<Categories>(context, listen: false)
+            .setTotal(total + suppTotal);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => PackageScreen()));
       }, () {
-        // Provider.of<Categories>(context, listen: false).setTotal(total);
+        Provider.of<Categories>(context, listen: false)
+            .setTotal(total - suppTotal);
         Navigator.of(context).pop();
       }),
     );

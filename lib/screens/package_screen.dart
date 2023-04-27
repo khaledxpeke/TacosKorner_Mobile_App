@@ -27,9 +27,10 @@ class PackageScreen extends StatefulWidget {
 
 class _PackageScreenState extends State<PackageScreen> {
   Map<String, dynamic> selectedPackage = {};
+  Map<String, dynamic> lastselectedPackage = {};
   late ScrollController _scrollController;
-  double total = 0;
   bool _isLoading = true;
+  double total = 0;
 
   @override
   void initState() {
@@ -50,7 +51,11 @@ class _PackageScreenState extends State<PackageScreen> {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
     List<dynamic> ingrediants =
         Provider.of<Ingredients>(context).selectedIngrediants;
-    int nbSteps = ((category['supplements'].isEmpty?0:1)+(category['type'].isEmpty?0:category['type'].length)+2).toInt();
+    total = Provider.of<Categories>(context).total;
+    int nbSteps = ((category['supplements'].isEmpty ? 0 : 1) +
+            (category['type'].isEmpty ? 0 : category['type'].length) +
+            2)
+        .toInt();
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -83,6 +88,9 @@ class _PackageScreenState extends State<PackageScreen> {
                               shrinkWrap: true,
                               itemCount: ingrediants.length,
                               itemBuilder: (BuildContext context, int index) {
+                                if (selectedPackage['price'] == 0) {
+                                  return Container();
+                                }
                                 return SideItem(
                                   ingrediants[index]['image'],
                                   ingrediants[index]['name'],
@@ -94,14 +102,10 @@ class _PackageScreenState extends State<PackageScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(
-                          double.parse((category['price'] +
-                                  total +
-                                  (selectedPackage != {}
-                                      ? selectedPackage['price'] ?? 0.0
-                                      : 0.0))
-                              .toStringAsFixed(2)),
-                          ingrediants.length),
+                      Consumer<Categories>(
+                        builder: (context, categories, _) =>
+                            TotalAndItems(categories.total, ingrediants.length),
+                      ),
                       SizedBox(
                         height: 85.h,
                       )
@@ -137,63 +141,91 @@ class _PackageScreenState extends State<PackageScreen> {
                                       children: context
                                           .watch<Package>()
                                           .packages
-                                          .map((package) => Row(
-                                                children: [
-                                                  CategoryItem(
-                                                      package['name'] == "seul"
-                                                          ? ""
-                                                          : package['image'],
-                                                      package['name'],
-                                                      package['price'] == 0
-                                                          ? null
-                                                          : package['price'],
-                                                      package['price'] == 0
-                                                          ? null
-                                                          : package['currency'],
-                                                      () {
-                                                    if (ingrediants
-                                                        .contains(
-                                                            selectedPackage)) {
-                                                      total -= selectedPackage[
-                                                                  'price'] ==
-                                                              0
-                                                          ? 0.0
-                                                          : selectedPackage[
-                                                              'price'];
-                                                      ingrediants
-                                                          .remove(
-                                                              selectedPackage);
-                                                      setState(() {
-                                                        selectedPackage = {};
-                                                      });
-                                                    } else {
-                                                      total +=
-                                                          package['price'] == 0
-                                                              ? 0.0
-                                                              : package[
-                                                                  'price'];
-                                                      ingrediants
-                                                          .add(package);
-                                                      setState(() {
-                                                        selectedPackage =
-                                                            package;
-                                                      });
-                                                    }
-                                                  },
-                                                      ingrediants
-                                                          .contains(package)),
-                                                  context
-                                                              .watch<Package>()
-                                                              .packages
-                                                              .last ==
-                                                          true
-                                                      ? Container()
-                                                      : SizedBox(
-                                                          width: 15.w,
-                                                        )
-                                                ],
-                                              ))
-                                          .toList(),
+                                          .map((package) {
+                                        final isSelected =
+                                            selectedPackage != {} &&
+                                                selectedPackage['name'] ==
+                                                    package['name'];
+                                        return Row(
+                                          children: [
+                                            CategoryItem(
+                                              package['name'] == "seul"
+                                                  ? ""
+                                                  : package['image'],
+                                              package['name'],
+                                              package['name'] == "seul"
+                                                  ? null
+                                                  : package['price'],
+                                              package['name'] == "seul"
+                                                  ? null
+                                                  : package['currency'],
+                                              () {
+                                                setState(() {
+                                                  if (isSelected) {
+                                                    final packagePrice =
+                                                        package['price'];
+                                                    print(
+                                                        "Selected package: ${package['name']}, price: $packagePrice");
+                                                    Provider.of<Categories>(
+                                                            context,
+                                                            listen: false)
+                                                        .setTotal(total -
+                                                            packagePrice);
+                                                    ingrediants.remove(package);
+                                                    selectedPackage = {};
+                                                    lastselectedPackage = {};
+                                                  } else {
+                                                    // if (selectedPackage
+                                                    //     .isNotEmpty) {
+                                                    //   final selectedPrice =
+                                                    //       selectedPackage[
+                                                    //           'price'];
+                                                    //   print(
+                                                    //       "Deselected package: ${selectedPackage['name']}, price: $selectedPrice");
+                                                    //   Provider.of<Categories>(
+                                                    //           context,
+                                                    //           listen: false)
+                                                    //       .setTotal(total -
+                                                    //           selectedPrice);
+                                                    //   ingrediants.remove(
+                                                    //       selectedPackage);
+                                                    // }
+
+                                                    final newPrice =
+                                                        package['price'];
+                                                    print(
+                                                        "Selected new package: ${package['name']}, price: $newPrice");
+                                                    Provider.of<Categories>(
+                                                            context,
+                                                            listen: false)
+                                                        .setTotal(total +
+                                                            newPrice -
+                                                            (lastselectedPackage[
+                                                                    'price'] ?? 0));
+                                                      ingrediants.remove(
+                                                          lastselectedPackage);
+                                                    ingrediants.add(package);
+                                                    lastselectedPackage =
+                                                        package;
+                                                    selectedPackage = package;
+                                                  }
+                                                  print("Total: $total");
+                                                });
+                                              },
+                                              isSelected,
+                                            ),
+                                            context
+                                                        .watch<Package>()
+                                                        .packages
+                                                        .last ==
+                                                    true
+                                                ? Container()
+                                                : SizedBox(
+                                                    width: 15.w,
+                                                  )
+                                          ],
+                                        );
+                                      }).toList(),
                                     )
                                   ],
                                 )
@@ -218,8 +250,6 @@ class _PackageScreenState extends State<PackageScreen> {
         } else {
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(ingrediants);
-          Provider.of<Categories>(context, listen: false)
-              .setTotal(total + selectedPackage['price']);
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => DessertScreen()));
         }

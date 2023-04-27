@@ -103,9 +103,7 @@ class _DessertScreenState extends State<DessertScreen> {
                         ),
                       ),
                       TotalAndItems(
-                          double.parse(
-                              (total + Provider.of<Categories>(context).total)
-                                  .toStringAsFixed(2)),
+                          total + Provider.of<Categories>(context).total,
                           selectedIngrediants.length),
                       SizedBox(
                         height: 85.h,

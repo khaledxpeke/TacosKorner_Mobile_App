@@ -24,7 +24,7 @@ class TotalAndItems extends StatelessWidget {
       child: Column(children: [
         SizedBox(height: 11.h),
         Text(
-          "Total: $total",
+          "Total: ${total.toStringAsFixed(2)}",
           style: TextStyle(
               fontWeight: FontWeight.w800, fontSize: 9.sp, color: lightColor),
         ),
