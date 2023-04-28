@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/http_exceptions.dart';
@@ -9,7 +10,7 @@ import '../models/http_exceptions.dart';
 class Package with ChangeNotifier {
   List<dynamic> packages = [];
 
-  final url = Uri.parse("http://192.168.1.24:3000/api");
+  final url = dotenv.env['API_URL'];
 
   Future<void> getPackage() async {
     try {

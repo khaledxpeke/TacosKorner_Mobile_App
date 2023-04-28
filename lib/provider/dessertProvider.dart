@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/http_exceptions.dart';
@@ -10,7 +11,7 @@ class Deserts with ChangeNotifier {
   List<dynamic> deserts = [];
   List<dynamic> desert = [];
 
-  final url = Uri.parse("http://192.168.1.24:3000/api");
+  final url = dotenv.env['API_URL'];
 
   Future<void> getDeserts() async {
     try {

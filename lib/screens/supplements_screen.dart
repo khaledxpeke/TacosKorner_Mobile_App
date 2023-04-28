@@ -27,7 +27,6 @@ class SupplementsScreen extends StatefulWidget {
 class _SupplementsScreenState extends State<SupplementsScreen> {
   late ScrollController _scrollController;
   List<dynamic> selectedIngrediants = [];
-  double suppTotal = 0;
 
   @override
   void initState() {
@@ -46,6 +45,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
     selectedIngrediants = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
+    int stepIndex = Provider.of<Categories>(context).stepIndex;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -89,8 +89,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(
-                          total + suppTotal, selectedIngrediants.length),
+                      TotalAndItems(total, selectedIngrediants.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -102,11 +101,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TopSide(
-                              category['name'],
-                              category['type'].isEmpty
-                                  ? 1
-                                  : category['type'].length + 1,
+                          TopSide(category['name'], stepIndex,
                               "Je choisir mes supplements"),
                           Expanded(
                             child: SingleChildScrollView(
@@ -141,13 +136,13 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                       setState(() {
                                         if (selectedIngrediants.contains(
                                             selectedSupplementsData[index])) {
-                                          suppTotal -=
+                                          total -=
                                               selectedSupplementsData[index]
                                                   ['price'];
                                           selectedIngrediants.remove(
                                               selectedSupplementsData[index]);
                                         } else {
-                                          suppTotal +=
+                                          total +=
                                               selectedSupplementsData[index]
                                                   ['price'];
                                           selectedIngrediants.add(
@@ -173,15 +168,17 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
         ),
       ),
       bottomSheet: bottomsheet(context, () {
+        Provider.of<Categories>(context, listen: false)
+            .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
             .setSelectedIngrediants(selectedIngrediants);
-        Provider.of<Categories>(context, listen: false)
-            .setTotal(total + suppTotal);
+        Provider.of<Categories>(context, listen: false).setTotal(total);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => PackageScreen()));
       }, () {
         Provider.of<Categories>(context, listen: false)
-            .setTotal(total - suppTotal);
+            .setStepIndex(stepIndex - 1);
+        Provider.of<Categories>(context, listen: false).setTotal(total);
         Navigator.of(context).pop();
       }),
     );

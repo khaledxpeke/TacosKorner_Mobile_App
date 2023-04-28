@@ -21,8 +21,9 @@ class TotalAndItems extends StatelessWidget {
           bottomRight: Radius.circular(15.r),
         ),
       ),
-      child: Column(children: [
-        SizedBox(height: 11.h),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
         Text(
           "Total: ${total.toStringAsFixed(2)}",
           style: TextStyle(

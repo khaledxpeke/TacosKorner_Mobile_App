@@ -10,6 +10,7 @@ import 'package:takos_korner/widgets/appbar.dart';
 import 'package:takos_korner/widgets/confirmationButton.dart';
 import 'package:takos_korner/widgets/topSide.dart';
 import '../provider/categoriesProvider.dart';
+import '../widgets/bottomsheet.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   const ConfirmationScreen({super.key});
@@ -18,8 +19,10 @@ class ConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    // total = Provider.of<Categories>(context).total;
+    int stepIndex = Provider.of<Categories>(context).stepIndex;
     // List<dynamic> sauce = Provider.of<Sauces>(context).sauce;
+    double total = Provider.of<Categories>(context).total;
+    print(total);
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -31,7 +34,7 @@ class ConfirmationScreen extends StatelessWidget {
           SizedBox(height: 26.h),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.w),
-            child: TopSide(category['name'], 4, ""),
+            child: TopSide(category['name'], stepIndex, ""),
           ),
           SizedBox(height: 85.h),
           Center(
@@ -81,6 +84,14 @@ class ConfirmationScreen extends StatelessWidget {
           )
         ],
       )),
+      bottomSheet: bottomsheet(context, () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => PaiementScreen()));
+      }, () {
+        Provider.of<Categories>(context, listen: false)
+            .setStepIndex(stepIndex - 1);
+        Navigator.of(context).pop();
+      }),
     );
   }
 }

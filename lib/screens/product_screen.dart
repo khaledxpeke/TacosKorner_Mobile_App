@@ -48,6 +48,7 @@ class _ProductScreenState extends State<ProductScreen> {
   @override
   Widget build(BuildContext context) {
     List<dynamic> categories = Provider.of<Categories>(context).categories;
+    int stepIndex = Provider.of<Categories>(context, listen: false).stepIndex;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -95,7 +96,8 @@ class _ProductScreenState extends State<ProductScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TopSide(categories[selectedCategory]['name'], Provider.of<Categories>(context, listen: false).stepIndex, ""),
+                          TopSide(categories[selectedCategory]['name'],
+                              stepIndex, ""),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -201,6 +203,7 @@ class _ProductScreenState extends State<ProductScreen> {
           Provider.of<Categories>(context, listen: false).setTotal(
               categories[selectedCategory]['products'][selectedProduct]
                   ['price']);
+          Provider.of<Categories>(context, listen: false).setStepIndex(1);
           if (type.isNotEmpty) {
             Provider.of<Ingredients>(context, listen: false).setTypes(type);
             Provider.of<Ingredients>(context, listen: false)
@@ -225,6 +228,7 @@ class _ProductScreenState extends State<ProductScreen> {
           }
         }
       }, () {
+        Provider.of<Categories>(context, listen: false).setStepIndex(0);
         Navigator.of(context).pop();
       }),
     );

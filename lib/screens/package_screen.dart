@@ -52,10 +52,7 @@ class _PackageScreenState extends State<PackageScreen> {
     List<dynamic> ingrediants =
         Provider.of<Ingredients>(context).selectedIngrediants;
     total = Provider.of<Categories>(context).total;
-    int nbSteps = ((category['supplements'].isEmpty ? 0 : 1) +
-            (category['type'].isEmpty ? 0 : category['type'].length) +
-            2)
-        .toInt();
+    int stepIndex = Provider.of<Categories>(context).stepIndex;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -88,15 +85,15 @@ class _PackageScreenState extends State<PackageScreen> {
                               shrinkWrap: true,
                               itemCount: ingrediants.length,
                               itemBuilder: (BuildContext context, int index) {
-                                if (selectedPackage['price'] == 0) {
-                                  return Container();
+                                if (ingrediants[index]['name'] != "Seul") {
+                                  return SideItem(
+                                    ingrediants[index]['image'],
+                                    ingrediants[index]['name'],
+                                    () {},
+                                    false,
+                                  );
                                 }
-                                return SideItem(
-                                  ingrediants[index]['image'],
-                                  ingrediants[index]['name'],
-                                  () {},
-                                  false,
-                                );
+                                return Container();
                               },
                             ),
                           ),
@@ -116,7 +113,7 @@ class _PackageScreenState extends State<PackageScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 8.w),
                       child: Column(
                         children: [
-                          TopSide(category['name'], nbSteps, ""),
+                          TopSide(category['name'], stepIndex, ""),
                           SizedBox(height: 100.h),
                           _isLoading
                               ? Center(
@@ -149,14 +146,16 @@ class _PackageScreenState extends State<PackageScreen> {
                                         return Row(
                                           children: [
                                             CategoryItem(
-                                              package['name'] == "seul"
+                                              package['name'] == "Seul"
                                                   ? ""
                                                   : package['image'],
                                               package['name'],
-                                              package['name'] == "seul"
+                                              package['name'] == "Seul"
                                                   ? null
-                                                  : package['price'],
-                                              package['name'] == "seul"
+                                                  : double.parse(
+                                                      package['price']
+                                                          .toString()),
+                                              package['name'] == "Seul"
                                                   ? null
                                                   : package['currency'],
                                               () {
@@ -164,8 +163,6 @@ class _PackageScreenState extends State<PackageScreen> {
                                                   if (isSelected) {
                                                     final packagePrice =
                                                         package['price'];
-                                                    print(
-                                                        "Selected package: ${package['name']}, price: $packagePrice");
                                                     Provider.of<Categories>(
                                                             context,
                                                             listen: false)
@@ -175,41 +172,23 @@ class _PackageScreenState extends State<PackageScreen> {
                                                     selectedPackage = {};
                                                     lastselectedPackage = {};
                                                   } else {
-                                                    // if (selectedPackage
-                                                    //     .isNotEmpty) {
-                                                    //   final selectedPrice =
-                                                    //       selectedPackage[
-                                                    //           'price'];
-                                                    //   print(
-                                                    //       "Deselected package: ${selectedPackage['name']}, price: $selectedPrice");
-                                                    //   Provider.of<Categories>(
-                                                    //           context,
-                                                    //           listen: false)
-                                                    //       .setTotal(total -
-                                                    //           selectedPrice);
-                                                    //   ingrediants.remove(
-                                                    //       selectedPackage);
-                                                    // }
-
                                                     final newPrice =
                                                         package['price'];
-                                                    print(
-                                                        "Selected new package: ${package['name']}, price: $newPrice");
                                                     Provider.of<Categories>(
                                                             context,
                                                             listen: false)
                                                         .setTotal(total +
                                                             newPrice -
                                                             (lastselectedPackage[
-                                                                    'price'] ?? 0));
-                                                      ingrediants.remove(
-                                                          lastselectedPackage);
+                                                                    'price'] ??
+                                                                0));
+                                                    ingrediants.remove(
+                                                        lastselectedPackage);
                                                     ingrediants.add(package);
                                                     lastselectedPackage =
                                                         package;
                                                     selectedPackage = package;
                                                   }
-                                                  print("Total: $total");
                                                 });
                                               },
                                               isSelected,
@@ -248,6 +227,7 @@ class _PackageScreenState extends State<PackageScreen> {
                     "Alert", "Veuillez sélectionner une formule");
               }));
         } else {
+          Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex + 1);
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(ingrediants);
           Navigator.push(context,
@@ -262,6 +242,7 @@ class _PackageScreenState extends State<PackageScreen> {
           }
           selectedPackage = {};
         });
+        Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
       }),
     );

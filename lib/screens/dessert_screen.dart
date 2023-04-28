@@ -8,7 +8,7 @@ import 'package:takos_korner/provider/ingrediantProvider.dart';
 import 'package:takos_korner/screens/confiramtion_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:takos_korner/widgets/totalAndItems.dart';
+import 'package:takos_korner/widgets/TotalAndItems.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
 import '../widgets/category.dart';
@@ -27,7 +27,9 @@ class DessertScreen extends StatefulWidget {
 class _DessertScreenState extends State<DessertScreen> {
   late ScrollController _scrollController;
   bool _isLoading = true;
-  double total = 0;
+  double newTotal = 0;
+  List<dynamic> selectedIngrediants = [];
+  List<dynamic> dessert = [];
 
   @override
   void initState() {
@@ -52,9 +54,12 @@ class _DessertScreenState extends State<DessertScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    // total = Provider.of<Categories>(context).total;
-    List<dynamic> selectedIngrediants =
+    int stepIndex = Provider.of<Categories>(context).stepIndex;
+    List<dynamic> ingrediants =
         Provider.of<Ingredients>(context).selectedIngrediants;
+    double total = Provider.of<Categories>(context).total;
+    dessert = ingrediants + selectedIngrediants;
+
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -85,15 +90,14 @@ class _DessertScreenState extends State<DessertScreen> {
                             child: ListView.builder(
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: selectedIngrediants.length,
+                              itemCount: dessert.length,
                               itemBuilder: (BuildContext context, int index) {
-                                if (selectedIngrediants[index]['name'] ==
-                                    "seul") {
+                                if (dessert[index]['name'] == "seul") {
                                   return Container();
                                 }
                                 return SideItem(
-                                  selectedIngrediants[index]['image'],
-                                  selectedIngrediants[index]['name'],
+                                  dessert[index]['image'],
+                                  dessert[index]['name'],
                                   () {},
                                   false,
                                 );
@@ -102,9 +106,7 @@ class _DessertScreenState extends State<DessertScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(
-                          total + Provider.of<Categories>(context).total,
-                          selectedIngrediants.length),
+                      TotalAndItems(newTotal + total, dessert.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -116,7 +118,7 @@ class _DessertScreenState extends State<DessertScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TopSide(category['name'], 3,
+                          TopSide(category['name'], stepIndex,
                               "Oh il vous manque que le dessert!"),
                           _isLoading
                               ? Center(
@@ -155,12 +157,12 @@ class _DessertScreenState extends State<DessertScreen> {
                                             setState(() {
                                               if (selectedIngrediants.contains(
                                                   desertData[index])) {
-                                                total -=
+                                                newTotal -=
                                                     desertData[index]['price'];
                                                 selectedIngrediants
                                                     .remove(desertData[index]);
                                               } else {
-                                                total +=
+                                                newTotal +=
                                                     desertData[index]['price'];
                                                 selectedIngrediants
                                                     .add(desertData[index]);
@@ -185,11 +187,34 @@ class _DessertScreenState extends State<DessertScreen> {
         ),
       ),
       bottomSheet: bottomsheet(context, () {
-        Provider.of<Deserts>(context, listen: false)
-            .setDessert(selectedIngrediants);
+        Provider.of<Categories>(context, listen: false)
+            .setStepIndex(stepIndex + 1);
+        Provider.of<Ingredients>(context, listen: false)
+            .setSelectedIngrediants(dessert);
+        Provider.of<Categories>(context, listen: false)
+            .setTotal(total + newTotal);
+        setState(() {
+          dessert.removeWhere((item) => selectedIngrediants.contains(item));
+        });
+        setState(() {
+          newTotal = 0;
+        });
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => ConfirmationScreen()));
       }, () {
+        double removeTotal = 0;
+        selectedIngrediants.forEach((item) {
+          removeTotal += item['price'];
+        });
+        Provider.of<Categories>(context, listen: false)
+            .setTotal(total - removeTotal);
+        setState(() {
+          dessert.removeWhere((item) => selectedIngrediants.contains(item));
+        });
+        Provider.of<Ingredients>(context, listen: false)
+            .setSelectedIngrediants(dessert);
+        Provider.of<Categories>(context, listen: false)
+            .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
       }),
     );

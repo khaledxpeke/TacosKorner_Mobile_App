@@ -49,6 +49,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
     List<dynamic> ingrediants = Provider.of<Ingredients>(context).ingrediants;
     List<dynamic> types = Provider.of<Ingredients>(context).types;
     int index = Provider.of<Ingredients>(context).index;
+    int stepIndex = Provider.of<Categories>(context).stepIndex;
     double total = Provider.of<Categories>(context).total;
     return Scaffold(
       backgroundColor: lightColor,
@@ -93,8 +94,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(
-                          total, selectedIngrediants.length),
+                      TotalAndItems(total, selectedIngrediants.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -106,16 +106,17 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TopSide(
-                              category['name'],
-                              index+1,
-                              type == "sauce"
-                                  ? "Je choisir mes sauces"
-                                  : type == "meat"
-                                      ? "Je choisir mes viande"
-                                      : type == "others"
-                                          ? "Je choisir mes salades"
-                                          : ""),
+                          Consumer<Categories>(
+                              builder: (context, categories, _) => TopSide(
+                                  category['name'],
+                                  categories.stepIndex,
+                                  type == "sauce"
+                                      ? "Je choisir mes sauces"
+                                      : type == "meat"
+                                          ? "Je choisir mes viande"
+                                          : type == "others"
+                                              ? "Je choisir mes salades"
+                                              : "")),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -191,6 +192,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         ),
       ),
       bottomSheet: bottomsheet(context, () {
+        Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex + 1);
         if (types.length - 1 > index) {
           Provider.of<Ingredients>(context, listen: false)
               .setType(types[index + 1]['name'], index + 1);
@@ -206,7 +208,17 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
           }
         }
       }, () {
-        Navigator.of(context).pop();
+        Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex - 1);
+        if (index > 0) {
+          setState(() {
+            selectedIngrediants.removeWhere(
+                (ingrediant) => ingrediant['type']['name'] == type);
+          });
+          Provider.of<Ingredients>(context, listen: false)
+              .setType(types[index - 1]['name'], index - 1);
+        } else {
+          Navigator.of(context).pop();
+        }
       }),
     );
   }

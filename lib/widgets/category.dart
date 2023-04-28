@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/utils/colors.dart';
 
@@ -22,6 +23,7 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final url = dotenv.env['API_URL'];
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -36,9 +38,9 @@ class CategoryItem extends StatelessWidget {
           Expanded(
             child: image == ""
                 ? Container()
-                : image!.startsWith("assets/images/")
-                    ? Image.asset(
-                        image!,
+                : image!.startsWith("uploads")
+                    ? Image.network(
+                        "$url/$image",
                         fit: BoxFit.cover,
                       )
                     : Image.network(
