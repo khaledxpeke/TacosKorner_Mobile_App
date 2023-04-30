@@ -27,9 +27,4 @@ class Package with ChangeNotifier {
       throw HttpException("il n'y a pas de depot encore, réessayer plus tard");
     }
   }
-
-  setDessert(List<dynamic> packages1) {
-    packages = packages1;
-    notifyListeners();
-  }
 }

@@ -15,6 +15,7 @@ import 'package:takos_korner/widgets/totalAndItems.dart';
 
 import '../widgets/Error_popup.dart';
 import '../widgets/appbar.dart';
+import '../widgets/loading.dart';
 import '../widgets/sideItem.dart';
 
 class PackageScreen extends StatefulWidget {
@@ -116,11 +117,7 @@ class _PackageScreenState extends State<PackageScreen> {
                           TopSide(category['name'], stepIndex, ""),
                           SizedBox(height: 100.h),
                           _isLoading
-                              ? Center(
-                                  child: CircularProgressIndicator(
-                                    color: primaryColor,
-                                  ),
-                                )
+                              ? LoadingWidget()
                               : Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -227,7 +224,8 @@ class _PackageScreenState extends State<PackageScreen> {
                     "Alert", "Veuillez sélectionner une formule");
               }));
         } else {
-          Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex + 1);
+          Provider.of<Categories>(context, listen: false)
+              .setStepIndex(stepIndex + 1);
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(ingrediants);
           Navigator.push(context,
@@ -242,7 +240,8 @@ class _PackageScreenState extends State<PackageScreen> {
           }
           selectedPackage = {};
         });
-        Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex - 1);
+        Provider.of<Categories>(context, listen: false)
+            .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
       }),
     );

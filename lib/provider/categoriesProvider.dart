@@ -10,11 +10,9 @@ class Categories with ChangeNotifier {
   List<dynamic> categories = [];
   Map<String, dynamic> category = {};
   int selectedCategory = -1;
-  int selectedProduct = -1;
   String formule = "";
-  String package = "";
   double total = 0;
-  int items = 0;
+  List<dynamic> products = [];
   int nbSteps = 4;
   int stepIndex = 0;
 
@@ -51,18 +49,13 @@ class Categories with ChangeNotifier {
     notifyListeners();
   }
 
-  setPackage(String package1) {
-    package = package1;
-    notifyListeners();
-  }
-
   setTotal(double total1) {
     total = total1;
     notifyListeners();
   }
 
-  setItems(int items1) {
-    items = items1;
+  setProducts(Map<String, dynamic> products1) {
+    products.add(products1);
     notifyListeners();
   }
 

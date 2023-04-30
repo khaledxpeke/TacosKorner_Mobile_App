@@ -157,10 +157,10 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                           selectedIngrediants
                                               .remove(ingrediantsData[index]);
                                         } else {
-                                          selectedIngrediants
-                                              .add(ingrediantsData[index]);
                                           if (type == 'sauce') {
-                                            if (nbsauce <= 2) {
+                                            if (nbsauce < 2) {
+                                              selectedIngrediants
+                                                  .add(ingrediantsData[index]);
                                               nbsauce += 1;
                                             } else {
                                               showDialog(
@@ -170,8 +170,12 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                         "Il faut choisir que 2 selectedIngrediantss au maximum");
                                                   }));
                                             }
+                                          } else {
+                                            selectedIngrediants
+                                                .add(ingrediantsData[index]);
                                           }
                                         }
+                                        print(nbsauce);
                                       });
                                     },
                                         selectedIngrediants
@@ -192,7 +196,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         ),
       ),
       bottomSheet: bottomsheet(context, () {
-        Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex + 1);
+        Provider.of<Categories>(context, listen: false)
+            .setStepIndex(stepIndex + 1);
         if (types.length - 1 > index) {
           Provider.of<Ingredients>(context, listen: false)
               .setType(types[index + 1]['name'], index + 1);
@@ -208,7 +213,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
           }
         }
       }, () {
-        Provider.of<Categories>(context, listen: false).setStepIndex(stepIndex - 1);
+        Provider.of<Categories>(context, listen: false)
+            .setStepIndex(stepIndex - 1);
         if (index > 0) {
           setState(() {
             selectedIngrediants.removeWhere(

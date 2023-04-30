@@ -2,9 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:takos_korner/utils/colors.dart';
 
-Widget bottomsheet(BuildContext context,VoidCallback onNext,VoidCallback onRetour) {
+import '../provider/categoriesProvider.dart';
+
+Widget bottomsheet(
+    BuildContext context, VoidCallback onNext, VoidCallback onRetour) {
+  int stepIndex = Provider.of<Categories>(context).stepIndex;
+  int nbSteps = Provider.of<Categories>(context).nbSteps;
   return Container(
     height: 85.h,
     decoration: BoxDecoration(
@@ -43,7 +49,7 @@ Widget bottomsheet(BuildContext context,VoidCallback onNext,VoidCallback onRetou
           TextButton(
               onPressed: onNext,
               child: Text(
-                "SUIVANT",
+                stepIndex == nbSteps - 1 ? "PAYER" : "SUIVANT",
                 style: TextStyle(
                     color: lightColor,
                     fontSize: 12.sp,
@@ -51,7 +57,7 @@ Widget bottomsheet(BuildContext context,VoidCallback onNext,VoidCallback onRetou
               ),
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
-                    primaryColor,
+                    stepIndex == nbSteps - 1 ? greenColor : primaryColor,
                   ),
                   padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                     EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),

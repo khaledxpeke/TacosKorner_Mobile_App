@@ -9,7 +9,6 @@ import '../models/http_exceptions.dart';
 
 class Deserts with ChangeNotifier {
   List<dynamic> deserts = [];
-  List<dynamic> desert = [];
 
   final url = dotenv.env['API_URL'];
 
@@ -27,10 +26,5 @@ class Deserts with ChangeNotifier {
       print('error: $e');
       throw HttpException("il n'y a pas de depot encore, réessayer plus tard");
     }
-  }
-
-  setDessert(List<dynamic> desert1) {
-    desert = desert1;
-    notifyListeners();
   }
 }

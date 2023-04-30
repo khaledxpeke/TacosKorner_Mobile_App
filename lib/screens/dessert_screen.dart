@@ -2,16 +2,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:takos_korner/provider/dessertProvider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/provider/ingrediantProvider.dart';
+import 'package:takos_korner/provider/suppelementsProvider.dart';
 import 'package:takos_korner/screens/confiramtion_screen.dart';
+import 'package:takos_korner/screens/package_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:takos_korner/widgets/TotalAndItems.dart';
+import 'package:takos_korner/widgets/totalAndItems.dart';
+import '../provider/dessertProvider.dart';
+import '../provider/ingrediantProvider.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
 import '../widgets/category.dart';
+import '../widgets/loading.dart';
 import '../widgets/sideItem.dart';
 import '../widgets/topSide.dart';
 
@@ -26,10 +29,11 @@ class DessertScreen extends StatefulWidget {
 
 class _DessertScreenState extends State<DessertScreen> {
   late ScrollController _scrollController;
-  bool _isLoading = true;
-  double newTotal = 0;
-  List<dynamic> selectedIngrediants = [];
+  List<dynamic> selectedDessert = [];
   List<dynamic> dessert = [];
+  double newTotal = 0;
+  double lastTotal = 0;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -54,12 +58,11 @@ class _DessertScreenState extends State<DessertScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    int stepIndex = Provider.of<Categories>(context).stepIndex;
     List<dynamic> ingrediants =
         Provider.of<Ingredients>(context).selectedIngrediants;
+    dessert = ingrediants + selectedDessert;
     double total = Provider.of<Categories>(context).total;
-    dessert = ingrediants + selectedIngrediants;
-
+    int stepIndex = Provider.of<Categories>(context).stepIndex;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -92,9 +95,6 @@ class _DessertScreenState extends State<DessertScreen> {
                               shrinkWrap: true,
                               itemCount: dessert.length,
                               itemBuilder: (BuildContext context, int index) {
-                                if (dessert[index]['name'] == "seul") {
-                                  return Container();
-                                }
                                 return SideItem(
                                   dessert[index]['image'],
                                   dessert[index]['name'],
@@ -121,11 +121,7 @@ class _DessertScreenState extends State<DessertScreen> {
                           TopSide(category['name'], stepIndex,
                               "Oh il vous manque que le dessert!"),
                           _isLoading
-                              ? Center(
-                                  child: CircularProgressIndicator(
-                                    color: primaryColor,
-                                  ),
-                                )
+                              ? LoadingWidget()
                               : Expanded(
                                   child: SingleChildScrollView(
                                     physics: BouncingScrollPhysics(),
@@ -146,31 +142,31 @@ class _DessertScreenState extends State<DessertScreen> {
                                         ),
                                         itemBuilder:
                                             (BuildContext context, int index) {
-                                          List<dynamic> desertData =
+                                          List<dynamic> dessertData =
                                               context.watch<Deserts>().deserts;
                                           return CategoryItem(
-                                              desertData[index]['image'],
-                                              desertData[index]['name'],
-                                              desertData[index]['price'],
-                                              desertData[index]['currency'],
+                                              dessertData[index]['image'],
+                                              dessertData[index]['name'],
+                                              dessertData[index]['price'],
+                                              dessertData[index]['currency'],
                                               () {
                                             setState(() {
-                                              if (selectedIngrediants.contains(
-                                                  desertData[index])) {
+                                              if (selectedDessert.contains(
+                                                  dessertData[index])) {
                                                 newTotal -=
-                                                    desertData[index]['price'];
-                                                selectedIngrediants
-                                                    .remove(desertData[index]);
+                                                    dessertData[index]['price'];
+                                                selectedDessert
+                                                    .remove(dessertData[index]);
                                               } else {
                                                 newTotal +=
-                                                    desertData[index]['price'];
-                                                selectedIngrediants
-                                                    .add(desertData[index]);
+                                                    dessertData[index]['price'];
+                                                selectedDessert
+                                                    .add(dessertData[index]);
                                               }
                                             });
                                           },
-                                              selectedIngrediants
-                                                  .contains(desertData[index]));
+                                              dessert.contains(
+                                                  dessertData[index]));
                                         },
                                       ),
                                     ),
@@ -190,26 +186,25 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(dessert);
+            .setSelectedIngrediants(ingrediants + selectedDessert);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
+        Provider.of<Categories>(context, listen: false).setProducts(
+          {"plat": category, "addons": dessert}
+        );
         setState(() {
-          dessert.removeWhere((item) => selectedIngrediants.contains(item));
-        });
-        setState(() {
+          dessert.removeWhere((item) => selectedDessert.contains(item));
+          selectedDessert = [];
+          lastTotal = newTotal;
           newTotal = 0;
         });
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => ConfirmationScreen()));
       }, () {
-        double removeTotal = 0;
-        selectedIngrediants.forEach((item) {
-          removeTotal += item['price'];
-        });
         Provider.of<Categories>(context, listen: false)
-            .setTotal(total - removeTotal);
+            .setTotal(total - lastTotal);
         setState(() {
-          dessert.removeWhere((item) => selectedIngrediants.contains(item));
+          dessert.removeWhere((item) => selectedDessert.contains(item));
         });
         Provider.of<Ingredients>(context, listen: false)
             .setSelectedIngrediants(dessert);

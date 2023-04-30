@@ -11,6 +11,7 @@ import 'package:takos_korner/widgets/category.dart';
 
 import '../provider/categoriesProvider.dart';
 import '../widgets/Error_popup.dart';
+import '../widgets/loading.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -56,11 +57,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
             ),
             SizedBox(height: 26.h),
             _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(
-                      color: primaryColor,
-                    ),
-                  )
+                ? LoadingWidget()
                 : Expanded(
                     child: SingleChildScrollView(
                       physics: BouncingScrollPhysics(),
