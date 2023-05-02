@@ -3,9 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/provider/suppelementsProvider.dart';
 import 'package:takos_korner/screens/confiramtion_screen.dart';
-import 'package:takos_korner/screens/package_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/totalAndItems.dart';
@@ -14,6 +12,7 @@ import '../provider/ingrediantProvider.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
 import '../widgets/category.dart';
+import '../widgets/error_meesage.dart';
 import '../widgets/loading.dart';
 import '../widgets/sideItem.dart';
 import '../widgets/topSide.dart';
@@ -34,6 +33,7 @@ class _DessertScreenState extends State<DessertScreen> {
   double newTotal = 0;
   double lastTotal = 0;
   bool _isLoading = true;
+  String errorMessage = "";
 
   @override
   void initState() {
@@ -43,9 +43,12 @@ class _DessertScreenState extends State<DessertScreen> {
   }
 
   void loadData() async {
-    await context.read<Deserts>().getDeserts();
+    String result = await context.read<Deserts>().getDeserts();
     setState(() {
       _isLoading = false;
+      if (result != "success") {
+        errorMessage = result;
+      }
     });
   }
 
@@ -122,56 +125,64 @@ class _DessertScreenState extends State<DessertScreen> {
                               "Oh il vous manque que le dessert!"),
                           _isLoading
                               ? LoadingWidget()
-                              : Expanded(
-                                  child: SingleChildScrollView(
-                                    physics: BouncingScrollPhysics(),
-                                    child: Padding(
-                                      padding: EdgeInsets.only(bottom: 95.h),
-                                      child: GridView.builder(
-                                        physics: NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: context
-                                            .watch<Deserts>()
-                                            .deserts
-                                            .length,
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          mainAxisSpacing: 10.h,
-                                          crossAxisSpacing: 23.w,
+                              : errorMessage != ""
+                                  ? ErrorMessage(errorMessage)
+                                  : Expanded(
+                                      child: SingleChildScrollView(
+                                        physics: BouncingScrollPhysics(),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsets.only(bottom: 95.h),
+                                          child: GridView.builder(
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount: context
+                                                .watch<Deserts>()
+                                                .deserts
+                                                .length,
+                                            gridDelegate:
+                                                SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              mainAxisSpacing: 10.h,
+                                              crossAxisSpacing: 23.w,
+                                            ),
+                                            itemBuilder: (BuildContext context,
+                                                int index) {
+                                              List<dynamic> dessertData =
+                                                  context
+                                                      .watch<Deserts>()
+                                                      .deserts;
+                                              return CategoryItem(
+                                                  dessertData[index]['image'],
+                                                  dessertData[index]['name'],
+                                                  dessertData[index]['price'],
+                                                  dessertData[index]
+                                                      ['currency'], () {
+                                                setState(() {
+                                                  if (selectedDessert.contains(
+                                                      dessertData[index])) {
+                                                    newTotal -=
+                                                        dessertData[index]
+                                                            ['price'];
+                                                    selectedDessert.remove(
+                                                        dessertData[index]);
+                                                  } else {
+                                                    newTotal +=
+                                                        dessertData[index]
+                                                            ['price'];
+                                                    selectedDessert.add(
+                                                        dessertData[index]);
+                                                  }
+                                                });
+                                              },
+                                                  dessert.contains(
+                                                      dessertData[index]));
+                                            },
+                                          ),
                                         ),
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          List<dynamic> dessertData =
-                                              context.watch<Deserts>().deserts;
-                                          return CategoryItem(
-                                              dessertData[index]['image'],
-                                              dessertData[index]['name'],
-                                              dessertData[index]['price'],
-                                              dessertData[index]['currency'],
-                                              () {
-                                            setState(() {
-                                              if (selectedDessert.contains(
-                                                  dessertData[index])) {
-                                                newTotal -=
-                                                    dessertData[index]['price'];
-                                                selectedDessert
-                                                    .remove(dessertData[index]);
-                                              } else {
-                                                newTotal +=
-                                                    dessertData[index]['price'];
-                                                selectedDessert
-                                                    .add(dessertData[index]);
-                                              }
-                                            });
-                                          },
-                                              dessert.contains(
-                                                  dessertData[index]));
-                                        },
                                       ),
                                     ),
-                                  ),
-                                ),
                         ],
                       ),
                     ),
@@ -189,9 +200,11 @@ class _DessertScreenState extends State<DessertScreen> {
             .setSelectedIngrediants(ingrediants + selectedDessert);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
-        Provider.of<Categories>(context, listen: false).setProducts(
-          {"plat": category, "addons": dessert}
-        );
+        Provider.of<Categories>(context, listen: false).setProducts({
+          "plat": category,
+          "addons": ingrediants + selectedDessert,
+          "total": total + newTotal
+        });
         setState(() {
           dessert.removeWhere((item) => selectedDessert.contains(item));
           selectedDessert = [];

@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ErrorPopUp extends StatelessWidget {
-  final String title;
-  final String errorMsg;
-  ErrorPopUp(this.title, this.errorMsg);
+class ConfirmationMessage extends StatelessWidget {
+  String title;
+  String errorMsg;
+  VoidCallback onPressed;
+  ConfirmationMessage(this.title, this.errorMsg, this.onPressed);
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,31 @@ class ErrorPopUp extends StatelessWidget {
             },
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
+                  lightColor,
+                ),
+                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                  EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+                ),
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                    side: BorderSide(
+                      color: dSilverColor,
+                      width: 2.w,
+                    ),
+                  ),
+                )),
+            child: Text(
+              "Non",
+              style: TextStyle(
+                  color: textColor,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w800),
+            )),
+        TextButton(
+            onPressed: onPressed,
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
                   primaryColor,
                 ),
                 padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
@@ -41,7 +67,7 @@ class ErrorPopUp extends StatelessWidget {
                   ),
                 )),
             child: Text(
-              "D'accord",
+              "Oui",
               style: TextStyle(
                   color: lightColor,
                   fontSize: 12.sp,

@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, file_names, use_key_in_widget_constructors
+// ignore_for_file: must_be_immutable, file_names, use_key_in_widget_constructors, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,9 +11,16 @@ class ConfirmationItem extends StatelessWidget {
   String currency;
   double price;
   List<dynamic> items;
+  VoidCallback onPressed;
 
   ConfirmationItem(
-      this.plat, this.platNumber, this.price, this.currency, this.items);
+    this.plat,
+    this.platNumber,
+    this.price,
+    this.currency,
+    this.items,
+    this.onPressed,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +29,24 @@ class ConfirmationItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "plat principale ${platNumber == 1 ? '' : platNumber}",
-            style: TextStyle(
-                fontWeight: FontWeight.w800, fontSize: 11.sp, color: textColor),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "plat principale ${platNumber == 0 ? '' : platNumber}",
+                style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 11.sp,
+                    color: textColor),
+              ),
+              IconButton(
+                onPressed: onPressed,
+                icon: Icon(
+                  Icons.close,
+                  size: 15.sp,
+                ),
+              )
+            ],
           ),
           SizedBox(height: 5.h),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

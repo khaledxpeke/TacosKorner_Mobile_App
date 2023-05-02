@@ -166,7 +166,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               showDialog(
                                                   context: context,
                                                   builder: ((context) {
-                                                    return ErrorMessage("Alert",
+                                                    return ErrorPopUp("Alert",
                                                         "Il faut choisir que 2 selectedIngrediantss au maximum");
                                                   }));
                                             }

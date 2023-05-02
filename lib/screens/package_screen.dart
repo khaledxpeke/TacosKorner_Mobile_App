@@ -15,6 +15,7 @@ import 'package:takos_korner/widgets/totalAndItems.dart';
 
 import '../widgets/Error_popup.dart';
 import '../widgets/appbar.dart';
+import '../widgets/error_meesage.dart';
 import '../widgets/loading.dart';
 import '../widgets/sideItem.dart';
 
@@ -32,6 +33,7 @@ class _PackageScreenState extends State<PackageScreen> {
   late ScrollController _scrollController;
   bool _isLoading = true;
   double total = 0;
+  String errorMessage = "";
 
   @override
   void initState() {
@@ -41,9 +43,12 @@ class _PackageScreenState extends State<PackageScreen> {
   }
 
   void loadData() async {
-    await context.read<Package>().getPackage();
+    String result = await context.read<Package>().getPackage();
     setState(() {
       _isLoading = false;
+      if (result != "success") {
+        errorMessage = result;
+      }
     });
   }
 
@@ -118,93 +123,100 @@ class _PackageScreenState extends State<PackageScreen> {
                           SizedBox(height: 100.h),
                           _isLoading
                               ? LoadingWidget()
-                              : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Je choisi ma formule",
-                                      style: TextStyle(
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w800,
-                                          color: textColor),
-                                    ),
-                                    SizedBox(height: 20.h),
-                                    Row(
+                              : errorMessage != ""
+                                  ? ErrorMessage(errorMessage)
+                                  : Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
-                                      children: context
-                                          .watch<Package>()
-                                          .packages
-                                          .map((package) {
-                                        final isSelected =
-                                            selectedPackage != {} &&
-                                                selectedPackage['name'] ==
-                                                    package['name'];
-                                        return Row(
-                                          children: [
-                                            CategoryItem(
-                                              package['name'] == "Seul"
-                                                  ? ""
-                                                  : package['image'],
-                                              package['name'],
-                                              package['name'] == "Seul"
-                                                  ? null
-                                                  : double.parse(
-                                                      package['price']
-                                                          .toString()),
-                                              package['name'] == "Seul"
-                                                  ? null
-                                                  : package['currency'],
-                                              () {
-                                                setState(() {
-                                                  if (isSelected) {
-                                                    final packagePrice =
-                                                        package['price'];
-                                                    Provider.of<Categories>(
-                                                            context,
-                                                            listen: false)
-                                                        .setTotal(total -
-                                                            packagePrice);
-                                                    ingrediants.remove(package);
-                                                    selectedPackage = {};
-                                                    lastselectedPackage = {};
-                                                  } else {
-                                                    final newPrice =
-                                                        package['price'];
-                                                    Provider.of<Categories>(
-                                                            context,
-                                                            listen: false)
-                                                        .setTotal(total +
-                                                            newPrice -
-                                                            (lastselectedPackage[
-                                                                    'price'] ??
-                                                                0));
-                                                    ingrediants.remove(
-                                                        lastselectedPackage);
-                                                    ingrediants.add(package);
-                                                    lastselectedPackage =
-                                                        package;
-                                                    selectedPackage = package;
-                                                  }
-                                                });
-                                              },
-                                              isSelected,
-                                            ),
-                                            context
-                                                        .watch<Package>()
-                                                        .packages
-                                                        .last ==
-                                                    true
-                                                ? Container()
-                                                : SizedBox(
-                                                    width: 15.w,
-                                                  )
-                                          ],
-                                        );
-                                      }).toList(),
+                                      children: [
+                                        Text(
+                                          "Je choisi ma formule",
+                                          style: TextStyle(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w800,
+                                              color: textColor),
+                                        ),
+                                        SizedBox(height: 20.h),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: context
+                                              .watch<Package>()
+                                              .packages
+                                              .map((package) {
+                                            final isSelected =
+                                                selectedPackage != {} &&
+                                                    selectedPackage['name'] ==
+                                                        package['name'];
+                                            return Row(
+                                              children: [
+                                                CategoryItem(
+                                                  package['name'] == "Seul"
+                                                      ? ""
+                                                      : package['image'],
+                                                  package['name'],
+                                                  package['name'] == "Seul"
+                                                      ? null
+                                                      : double.parse(
+                                                          package['price']
+                                                              .toString()),
+                                                  package['name'] == "Seul"
+                                                      ? null
+                                                      : package['currency'],
+                                                  () {
+                                                    setState(() {
+                                                      if (isSelected) {
+                                                        final packagePrice =
+                                                            package['price'];
+                                                        Provider.of<Categories>(
+                                                                context,
+                                                                listen: false)
+                                                            .setTotal(total -
+                                                                packagePrice);
+                                                        ingrediants
+                                                            .remove(package);
+                                                        selectedPackage = {};
+                                                        lastselectedPackage =
+                                                            {};
+                                                      } else {
+                                                        final newPrice =
+                                                            package['price'];
+                                                        Provider.of<Categories>(
+                                                                context,
+                                                                listen: false)
+                                                            .setTotal(total +
+                                                                newPrice -
+                                                                (lastselectedPackage[
+                                                                        'price'] ??
+                                                                    0));
+                                                        ingrediants.remove(
+                                                            lastselectedPackage);
+                                                        ingrediants
+                                                            .add(package);
+                                                        lastselectedPackage =
+                                                            package;
+                                                        selectedPackage =
+                                                            package;
+                                                      }
+                                                    });
+                                                  },
+                                                  isSelected,
+                                                ),
+                                                context
+                                                            .watch<Package>()
+                                                            .packages
+                                                            .last ==
+                                                        true
+                                                    ? Container()
+                                                    : SizedBox(
+                                                        width: 15.w,
+                                                      )
+                                              ],
+                                            );
+                                          }).toList(),
+                                        )
+                                      ],
                                     )
-                                  ],
-                                )
                         ],
                       ),
                     ),
@@ -220,8 +232,7 @@ class _PackageScreenState extends State<PackageScreen> {
           showDialog(
               context: context,
               builder: ((context) {
-                return ErrorMessage(
-                    "Alert", "Veuillez sélectionner une formule");
+                return ErrorPopUp("Alert", "Veuillez sélectionner une formule");
               }));
         } else {
           Provider.of<Categories>(context, listen: false)

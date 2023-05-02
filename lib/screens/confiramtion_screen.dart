@@ -9,8 +9,10 @@ import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/appbar.dart';
 import 'package:takos_korner/widgets/topSide.dart';
 import '../provider/categoriesProvider.dart';
+import '../widgets/Error_popup.dart';
 import '../widgets/bottomsheet.dart';
 import '../widgets/confirmationItems.dart';
+import '../widgets/confirmationMessage.dart';
 
 class ConfirmationScreen extends StatefulWidget {
   const ConfirmationScreen({super.key});
@@ -21,14 +23,29 @@ class ConfirmationScreen extends StatefulWidget {
 }
 
 class _ConfirmationScreenState extends State<ConfirmationScreen> {
-  double confirmationTotal = 0;
+  double confirmationTotal = 0.0;
   String currency = "DT";
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     int stepIndex = Provider.of<Categories>(context).stepIndex;
-    confirmationTotal = Provider.of<Categories>(context).total;
     List<dynamic> products = Provider.of<Categories>(context).products;
+    setState(() {
+      confirmationTotal = 0.0;
+    });
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -57,25 +74,71 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        physics: BouncingScrollPhysics(),
-                        child: Column(
-                            children: products.map((product) {
-                          // final int index = int.parse(entry.key);
-                          // final Map<String, dynamic> product = entry.value;
-                          return ConfirmationItem(
-                              product['plat']['name'],
-                              1,
-                              product['plat']['price'],
-                              product['plat']['currency'],
-                              product['addons']
-                                  .map((addons) => {
-                                        "name": addons['name'],
-                                        "price": addons['price'] ?? "Free",
-                                        "currency": addons['currency'] ?? ""
-                                      })
-                                  .toList());
-                        }).toList()),
+                      child: Scrollbar(
+                        thickness: 4.w,
+                        radius: Radius.circular(10.r),
+                        controller: _scrollController,
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Column(children: [
+                            if (products.isEmpty)
+                              Center(
+                                child: Text(
+                                  "Il n'y a pas de produits sélectionnés pour le moment",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 10.sp,
+                                      color: textColor),
+                                ),
+                              ),
+                            ...products.asMap().entries.map((entry) {
+                              final int index = entry.key;
+                              final Map<String, dynamic> product = entry.value;
+                              setState(() {
+                                confirmationTotal += product['total'];
+                                currency = product['plat']['currency'];
+                              });
+                              return ConfirmationItem(
+                                product['plat']['name'],
+                                products.length > 1 ? index + 1 : 0,
+                                product['plat']['price'],
+                                product['plat']['currency'],
+                                product['addons']
+                                    .map((addons) => {
+                                          "name": addons['name'],
+                                          "price": addons['price'] == null ||
+                                                  addons['price'] == 0
+                                              ? "Free"
+                                              : addons['price'],
+                                          "currency": addons['price'] == null ||
+                                                  addons['price'] == 0
+                                              ? ""
+                                              : addons['currency']
+                                        })
+                                    .toList(),
+                                () {
+                                  showDialog(
+                                      context: context,
+                                      builder: ((context) {
+                                        return ConfirmationMessage("Alert",
+                                            "Vous étes sure que vous voulez retirer ce produit!",
+                                            () {
+                                          setState(() {
+                                            confirmationTotal -=
+                                                product['total'];
+                                          });
+                                          Provider.of<Categories>(context,
+                                                  listen: false)
+                                              .removeProduct();
+                                          Navigator.of(context).pop();
+                                        });
+                                      }));
+                                },
+                              );
+                            }).toList()
+                          ]),
+                        ),
                       ),
                     ),
                     Divider(
@@ -101,6 +164,13 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           Center(
             child: GestureDetector(
               onTap: () {
+                setState(() {
+                  confirmationTotal = 0;
+                });
+                Provider.of<Categories>(context, listen: false)
+                    .setLastStepIndex(stepIndex);
+                Provider.of<Categories>(context, listen: false).setStepIndex(0);
+                // Navigator.pushReplacementNamed(context, CategoryScreen.routeName);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => CategoryScreen()));
               },
@@ -135,11 +205,21 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
         ],
       )),
       bottomSheet: bottomsheet(context, () {
-        Provider.of<Categories>(context, listen: false)
-            .setStepIndex(0);
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PaiementScreen()));
+        if (confirmationTotal == 0) {
+          showDialog(
+              context: context,
+              builder: ((context) {
+                return ErrorPopUp(
+                    "Alert", "veuillez sélectionner un produit d'abord");
+              }));
+        } else {
+          Provider.of<Categories>(context, listen: false).setStepIndex(0);
+          Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => PaiementScreen()));
+        }
       }, () {
+        Provider.of<Categories>(context, listen: false).removeProduct();
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();

@@ -190,7 +190,7 @@ class _ProductScreenState extends State<ProductScreen> {
           showDialog(
               context: context,
               builder: ((context) {
-                return ErrorMessage(
+                return ErrorPopUp(
                     "Alert", "Il faut choisir votre produit pour continuer");
               }));
         } else {

@@ -11,6 +11,7 @@ import 'package:takos_korner/widgets/category.dart';
 
 import '../provider/categoriesProvider.dart';
 import '../widgets/Error_popup.dart';
+import '../widgets/error_meesage.dart';
 import '../widgets/loading.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   int selectedCategory = -1;
   bool _isLoading = true;
   List<dynamic> categories = [];
+  String errorMessage = "";
 
   @override
   void initState() {
@@ -32,14 +34,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   void loadData() async {
-    await context.read<Categories>().getCategories();
+    String result = await context.read<Categories>().getCategories();
     setState(() {
       _isLoading = false;
+      if (result != "success") {
+        errorMessage = result;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    int lastStepIndex = Provider.of<Categories>(context).lastStepIndex;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -58,45 +64,48 @@ class _CategoryScreenState extends State<CategoryScreen> {
             SizedBox(height: 26.h),
             _isLoading
                 ? LoadingWidget()
-                : Expanded(
-                    child: SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(53.w, 0, 53.w, 95.h),
-                        child: GridView.builder(
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount:
-                              context.watch<Categories>().categories.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 10.h,
-                            crossAxisSpacing: 23.w,
-                          ),
-                          itemBuilder: (BuildContext context, int index) {
-                            categories = context.watch<Categories>().categories;
-                            return CategoryItem(
-                              categories[index]['image'],
-                              categories[index]['name'],
-                              null,
-                              null,
-                              () {
-                                setState(() {
-                                  if (selectedCategory == index) {
-                                    selectedCategory = -1;
-                                  } else {
-                                    selectedCategory = index;
-                                  }
-                                });
+                : errorMessage != ""
+                    ? ErrorMessage(errorMessage)
+                    : Expanded(
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(53.w, 0, 53.w, 95.h),
+                            child: GridView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount:
+                                  context.watch<Categories>().categories.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 10.h,
+                                crossAxisSpacing: 23.w,
+                              ),
+                              itemBuilder: (BuildContext context, int index) {
+                                categories =
+                                    context.watch<Categories>().categories;
+                                return CategoryItem(
+                                  categories[index]['image'],
+                                  categories[index]['name'],
+                                  null,
+                                  null,
+                                  () {
+                                    setState(() {
+                                      if (selectedCategory == index) {
+                                        selectedCategory = -1;
+                                      } else {
+                                        selectedCategory = index;
+                                      }
+                                    });
+                                  },
+                                  index == selectedCategory,
+                                );
                               },
-                              index == selectedCategory,
-                            );
-                          },
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
           ],
         ),
       ),
@@ -105,7 +114,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           showDialog(
               context: context,
               builder: ((context) {
-                return ErrorMessage("Alert",
+                return ErrorPopUp("Alert",
                     "Il faut choisir votre catégorie préférée d'abord");
               }));
         } else {
@@ -115,6 +124,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
               MaterialPageRoute(builder: (context) => ProductScreen()));
         }
       }, () {
+        if (lastStepIndex > 0) {
+          Provider.of<Categories>(context, listen: false)
+              .setStepIndex(lastStepIndex);
+        }
         Navigator.of(context).pop();
       }),
     );

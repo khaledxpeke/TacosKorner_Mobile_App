@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:takos_korner/screens/Home_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 
 class PaiementScreen extends StatelessWidget {
@@ -8,6 +9,9 @@ class PaiementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(const Duration(seconds: 5), () {
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    });
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(

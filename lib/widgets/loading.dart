@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/utils/colors.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoadingWidget extends StatelessWidget {
   const LoadingWidget({super.key});
@@ -11,11 +12,10 @@ class LoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.only(bottom: 85.h),
+        padding: EdgeInsets.only(bottom: 200.h),
         child: Center(
-          child: CircularProgressIndicator(
-            color: primaryColor,
-          ),
+          child:
+              LoadingAnimationWidget.inkDrop(color: primaryColor, size: 25.w),
         ),
       ),
     );
