@@ -58,7 +58,7 @@ class CategoryItem extends StatelessWidget {
           ),
           price != null
               ? Padding(
-                  padding: EdgeInsets.only(top: 3.h),
+                  padding: EdgeInsets.only(top: 3.h,left: 3,right: 3),
                   child: Text(
                     "$price $currency",
                     style: TextStyle(

@@ -46,9 +46,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    List<dynamic> ingrediants =
-        Provider.of<Ingredients>(context).selectedIngrediants;
-    supplements = ingrediants + selectedSupplements;
+    supplements = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     return Scaffold(
@@ -137,21 +135,25 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                         supplementsData[index]['price'],
                                         supplementsData[index]['currency'], () {
                                       setState(() {
-                                        if (selectedSupplements
+                                        if (supplements
                                             .contains(supplementsData[index])) {
                                           newTotal -=
                                               supplementsData[index]['price'];
+                                          supplements
+                                              .remove(supplementsData[index]);
                                           selectedSupplements
                                               .remove(supplementsData[index]);
                                         } else {
                                           newTotal +=
                                               supplementsData[index]['price'];
+                                          supplements
+                                              .add(supplementsData[index]);
                                           selectedSupplements
                                               .add(supplementsData[index]);
                                         }
                                       });
                                     },
-                                        supplements
+                                        selectedSupplements
                                             .contains(supplementsData[index]));
                                   },
                                 ),
@@ -172,12 +174,10 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(ingrediants + selectedSupplements);
+            .setSelectedIngrediants(supplements);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
         setState(() {
-          supplements.removeWhere((item) => selectedSupplements.contains(item));
-          selectedSupplements=[];
           lastTotal = newTotal;
           newTotal = 0;
         });

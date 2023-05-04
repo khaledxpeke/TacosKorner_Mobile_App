@@ -3,11 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
+import 'package:takos_korner/provider/dessertProvider.dart';
 import 'package:takos_korner/screens/confiramtion_screen.dart';
+import 'package:takos_korner/screens/package_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/totalAndItems.dart';
-import '../provider/dessertProvider.dart';
 import '../provider/ingrediantProvider.dart';
 import '../widgets/appbar.dart';
 import '../widgets/bottomsheet.dart';
@@ -29,7 +30,7 @@ class DessertScreen extends StatefulWidget {
 class _DessertScreenState extends State<DessertScreen> {
   late ScrollController _scrollController;
   List<dynamic> selectedDessert = [];
-  List<dynamic> dessert = [];
+  List<dynamic> desserts = [];
   double newTotal = 0;
   double lastTotal = 0;
   bool _isLoading = true;
@@ -61,9 +62,7 @@ class _DessertScreenState extends State<DessertScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    List<dynamic> ingrediants =
-        Provider.of<Ingredients>(context).selectedIngrediants;
-    dessert = ingrediants + selectedDessert;
+    desserts = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     return Scaffold(
@@ -96,11 +95,11 @@ class _DessertScreenState extends State<DessertScreen> {
                             child: ListView.builder(
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: dessert.length,
+                              itemCount: desserts.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return SideItem(
-                                  dessert[index]['image'],
-                                  dessert[index]['name'],
+                                  desserts[index]['image'],
+                                  desserts[index]['name'],
                                   () {},
                                   false,
                                 );
@@ -109,7 +108,7 @@ class _DessertScreenState extends State<DessertScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(newTotal + total, dessert.length),
+                      TotalAndItems(newTotal + total, desserts.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -149,35 +148,39 @@ class _DessertScreenState extends State<DessertScreen> {
                                             ),
                                             itemBuilder: (BuildContext context,
                                                 int index) {
-                                              List<dynamic> dessertData =
+                                              List<dynamic> dessertsData =
                                                   context
                                                       .watch<Deserts>()
                                                       .deserts;
                                               return CategoryItem(
-                                                  dessertData[index]['image'],
-                                                  dessertData[index]['name'],
-                                                  dessertData[index]['price'],
-                                                  dessertData[index]
+                                                  dessertsData[index]['image'],
+                                                  dessertsData[index]['name'],
+                                                  dessertsData[index]['price'],
+                                                  dessertsData[index]
                                                       ['currency'], () {
                                                 setState(() {
                                                   if (selectedDessert.contains(
-                                                      dessertData[index])) {
+                                                      dessertsData[index])) {
                                                     newTotal -=
-                                                        dessertData[index]
+                                                        dessertsData[index]
                                                             ['price'];
                                                     selectedDessert.remove(
-                                                        dessertData[index]);
+                                                        dessertsData[index]);
+                                                    desserts.remove(
+                                                        dessertsData[index]);
                                                   } else {
                                                     newTotal +=
-                                                        dessertData[index]
+                                                        dessertsData[index]
                                                             ['price'];
                                                     selectedDessert.add(
-                                                        dessertData[index]);
+                                                        dessertsData[index]);
+                                                    desserts.add(
+                                                        dessertsData[index]);
                                                   }
                                                 });
                                               },
-                                                  dessert.contains(
-                                                      dessertData[index]));
+                                                  desserts.contains(
+                                                      dessertsData[index]));
                                             },
                                           ),
                                         ),
@@ -197,17 +200,13 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(ingrediants + selectedDessert);
+            .setSelectedIngrediants(desserts);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
-        Provider.of<Categories>(context, listen: false).setProducts({
-          "plat": category,
-          "addons": ingrediants + selectedDessert,
-          "total": total + newTotal
-        });
+        Provider.of<Categories>(context, listen: false).setProducts(
+            {"plat": category, "addons": desserts, "total": total + newTotal});
         setState(() {
-          dessert.removeWhere((item) => selectedDessert.contains(item));
-          selectedDessert = [];
+          // desserts.removeWhere((item) => selectedDessert.contains(item));
           lastTotal = newTotal;
           newTotal = 0;
         });
@@ -217,10 +216,10 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setTotal(total - lastTotal);
         setState(() {
-          dessert.removeWhere((item) => selectedDessert.contains(item));
+          desserts.removeWhere((item) => selectedDessert.contains(item));
         });
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(dessert);
+            .setSelectedIngrediants(desserts);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
