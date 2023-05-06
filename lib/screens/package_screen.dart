@@ -254,7 +254,7 @@ class _PackageScreenState extends State<PackageScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
-      }),
+      },false),
     );
   }
 }

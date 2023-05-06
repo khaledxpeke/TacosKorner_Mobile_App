@@ -206,7 +206,6 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false).setProducts(
             {"plat": category, "addons": desserts, "total": total + newTotal});
         setState(() {
-          // desserts.removeWhere((item) => selectedDessert.contains(item));
           lastTotal = newTotal;
           newTotal = 0;
         });
@@ -223,7 +222,7 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
-      }),
+      },false),
     );
   }
 }

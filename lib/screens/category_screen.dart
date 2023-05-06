@@ -129,7 +129,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               .setStepIndex(lastStepIndex);
         }
         Navigator.of(context).pop();
-      }),
+      },false),
     );
   }
 }

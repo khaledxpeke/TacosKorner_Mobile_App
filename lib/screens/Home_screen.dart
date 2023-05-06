@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isInactive = false;
   late final GifController gifController;
   void _startTimer() {
-    timer = Timer(Duration(seconds: 5), () {
+    timer = Timer(Duration(seconds: 60), () {
       setState(() {
         isInactive = true;
       });

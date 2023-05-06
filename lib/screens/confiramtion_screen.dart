@@ -1,8 +1,9 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:takos_korner/provider/history.dart';
 import 'package:takos_korner/screens/category_screen.dart';
 import 'package:takos_korner/screens/paiement_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
@@ -26,6 +27,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   double confirmationTotal = 0.0;
   String currency = "DT";
   late ScrollController _scrollController;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   Widget build(BuildContext context) {
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     List<dynamic> products = Provider.of<Categories>(context).products;
+    String formule = Provider.of<Categories>(context).formule;
     setState(() {
       confirmationTotal = 0.0;
     });
@@ -170,7 +173,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 Provider.of<Categories>(context, listen: false)
                     .setLastStepIndex(stepIndex);
                 Provider.of<Categories>(context, listen: false).setStepIndex(0);
-                // Navigator.pushReplacementNamed(context, CategoryScreen.routeName);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => CategoryScreen()));
               },
@@ -204,7 +206,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           )
         ],
       )),
-      bottomSheet: bottomsheet(context, () {
+      bottomSheet: bottomsheet(context, () async {
         if (confirmationTotal == 0) {
           showDialog(
               context: context,
@@ -213,17 +215,41 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     "Alert", "veuillez sélectionner un produit d'abord");
               }));
         } else {
-          Provider.of<Categories>(context, listen: false).setStepIndex(0);
-          Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => PaiementScreen()));
+          List<dynamic> productsHistory = products
+              .map((product) =>
+                  {'plat': product['plat']['_id'], 'addons': product['addons']})
+              .toList();
+          // setState(() {
+          //   isLoading = true;
+          // });
+          Histories histories = Histories();
+          String errorMessage = await histories.addHistory(productsHistory, formule,
+                  confirmationTotal.toString() + currency);
+              // .whenComplete(() => setState(() {
+              //       isLoading = false;
+                    
+              //     }));
+          if (errorMessage == "success") {
+            Provider.of<Categories>(context, listen: false).setStepIndex(0);
+            Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
+            Provider.of<Categories>(context, listen: false).setNbSteps(4);
+            Provider.of<Categories>(context, listen: false).removeAllProducts();
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PaiementScreen()));
+          } else {
+            showDialog(
+                context: context,
+                builder: ((context) {
+                  return ErrorPopUp("Alert", errorMessage);
+                }));
+          }
         }
       }, () {
         Provider.of<Categories>(context, listen: false).removeProduct();
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
-      }),
+      }, isLoading),
     );
   }
 }

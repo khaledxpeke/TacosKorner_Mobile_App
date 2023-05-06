@@ -14,12 +14,13 @@ class Package with ChangeNotifier {
   Future<String> getPackage() async {
     try {
       final response = await http.get(Uri.parse("$url/pack"));
+      final body = json.decode(response.body);
       if (response.statusCode == 200) {
-        packages = json.decode(response.body);
+        packages = body;
         notifyListeners();
         return "success";
       } else {
-        return 'Réponse invalide reçue du serveur! : ${response.statusCode} ';
+        return body['message'];
       }
     } on SocketException {
       return "Impossible d'accéder à Internet!";

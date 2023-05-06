@@ -22,12 +22,13 @@ class Categories with ChangeNotifier {
   Future<String> getCategories() async {
     try {
       final response = await http.get(Uri.parse("$url/category"));
+      final body = json.decode(response.body);
       if (response.statusCode == 200) {
-        categories = json.decode(response.body);
+        categories = body;
         notifyListeners();
         return "success";
       } else {
-        return 'Réponse invalide reçue du serveur! : ${response.statusCode} ';
+        return body['message'];
       }
     } on SocketException {
       return "Impossible d'accéder à Internet!";
@@ -67,6 +68,11 @@ class Categories with ChangeNotifier {
     if (products.isNotEmpty) {
       products.removeLast();
     }
+    notifyListeners();
+  }
+
+  removeAllProducts() {
+    products = [];
     notifyListeners();
   }
 

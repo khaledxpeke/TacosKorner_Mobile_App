@@ -110,11 +110,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                               builder: (context, categories, _) => TopSide(
                                   category['name'],
                                   categories.stepIndex,
-                                  type == "sauce"
+                                  type.toUpperCase() == 'SAUCE'
                                       ? "Je choisir mes sauces"
-                                      : type == "meat"
+                                      : type.toUpperCase() == 'MEAT'
                                           ? "Je choisir mes viande"
-                                          : type == "others"
+                                          : type.toUpperCase() == 'OTHERS'
                                               ? "Je choisir mes salades"
                                               : "")),
                           Expanded(
@@ -151,13 +151,13 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                       setState(() {
                                         if (selectedIngrediants
                                             .contains(ingrediantsData[index])) {
-                                          if (type == 'sauce') {
+                                          if (type.toUpperCase() == 'SAUCE') {
                                             nbsauce -= 1;
                                           }
                                           selectedIngrediants
                                               .remove(ingrediantsData[index]);
                                         } else {
-                                          if (type == 'sauce') {
+                                          if (type.toUpperCase() == 'SAUCE') {
                                             if (nbsauce < 2) {
                                               selectedIngrediants
                                                   .add(ingrediantsData[index]);
@@ -175,7 +175,6 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                 .add(ingrediantsData[index]);
                                           }
                                         }
-                                        print(nbsauce);
                                       });
                                     },
                                         selectedIngrediants
@@ -215,6 +214,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
       }, () {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
+        if(type.toUpperCase() == 'SAUCE'){
+          setState(() {
+            nbsauce=0;
+          });
+        }
         if (index > 0) {
           setState(() {
             selectedIngrediants.removeWhere(
@@ -225,7 +229,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         } else {
           Navigator.of(context).pop();
         }
-      }),
+      },false),
     );
   }
 }
