@@ -12,7 +12,7 @@ class Histories {
       List<dynamic> products, String pack, String total) async {
     try {
       final response = await http.post(Uri.parse("$url/history"), body: {
-        "product": json.encode(products),
+        "products": json.encode(products),
         "pack": pack,
         "total": total
       });
@@ -22,14 +22,11 @@ class Histories {
       } else {
         return body['message'];
       }
-    } on SocketException catch (e) {
-      print('SocketException: $e');
+    } on SocketException{
       return "Impossible d'accéder à Internet!";
-    } on FormatException catch (e) {
-      print('FormatException: $e');
+    } on FormatException {
       return "Une erreur s'est produite";
     } catch (exception) {
-      print('Exception: $exception');
       return exception.toString();
     }
   }

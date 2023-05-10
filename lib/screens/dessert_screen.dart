@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
 import 'package:takos_korner/provider/dessertProvider.dart';
 import 'package:takos_korner/screens/confiramtion_screen.dart';
-import 'package:takos_korner/screens/package_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/totalAndItems.dart';

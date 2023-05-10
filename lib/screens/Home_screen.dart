@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gif/gif.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/screens/category_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
@@ -19,7 +18,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Timer? timer;
   bool isInactive = false;
-  late final GifController gifController;
   void _startTimer() {
     timer = Timer(Duration(seconds: 60), () {
       setState(() {
@@ -35,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    gifController = GifController(vsync: this);
     _startTimer();
   }
 

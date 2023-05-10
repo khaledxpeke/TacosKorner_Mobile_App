@@ -28,6 +28,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   String currency = "DT";
   late ScrollController _scrollController;
   bool isLoading = false;
+  String errorMessage = "";
 
   @override
   void initState() {
@@ -219,16 +220,16 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               .map((product) =>
                   {'plat': product['plat']['_id'], 'addons': product['addons']})
               .toList();
-          // setState(() {
-          //   isLoading = true;
-          // });
+          setState(() {
+            isLoading = true;
+          });
           Histories histories = Histories();
-          String errorMessage = await histories.addHistory(productsHistory, formule,
-                  confirmationTotal.toString() + currency);
-              // .whenComplete(() => setState(() {
-              //       isLoading = false;
-                    
-              //     }));
+          errorMessage = await histories
+              .addHistory(productsHistory, formule,
+                  confirmationTotal.toString() + currency)
+              .whenComplete(() => setState(() {
+                    isLoading = false;
+                  }));
           if (errorMessage == "success") {
             Provider.of<Categories>(context, listen: false).setStepIndex(0);
             Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
