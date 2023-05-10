@@ -46,6 +46,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   Widget build(BuildContext context) {
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     List<dynamic> products = Provider.of<Categories>(context).products;
+    Map<String, dynamic> lastProduct = Provider.of<Categories>(context).lastProduct;
     String formule = Provider.of<Categories>(context).formule;
     setState(() {
       confirmationTotal = 0.0;
@@ -131,10 +132,12 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                           setState(() {
                                             confirmationTotal -=
                                                 product['total'];
+
+                                            Provider.of<Categories>(context,
+                                                    listen: false)
+                                                .removeProduct(product);
+                                            products.remove(product);
                                           });
-                                          Provider.of<Categories>(context,
-                                                  listen: false)
-                                              .removeProduct();
                                           Navigator.of(context).pop();
                                         });
                                       }));
@@ -246,7 +249,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           }
         }
       }, () {
-        Provider.of<Categories>(context, listen: false).removeProduct();
+        if (lastProduct == products.last) {
+          Provider.of<Categories>(context, listen: false).removeLastProduct();
+        }
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();

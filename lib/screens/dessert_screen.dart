@@ -96,12 +96,16 @@ class _DessertScreenState extends State<DessertScreen> {
                               shrinkWrap: true,
                               itemCount: desserts.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return SideItem(
-                                  desserts[index]['image'],
-                                  desserts[index]['name'],
-                                  () {},
-                                  false,
-                                );
+                                if (desserts[index]['name'].toUpperCase() !=
+                                    "SEUL") {
+                                  return SideItem(
+                                    desserts[index]['image'],
+                                    desserts[index]['name'],
+                                    () {},
+                                    false,
+                                  );
+                                }
+                                return Container();
                               },
                             ),
                           ),
@@ -221,7 +225,7 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
-      },false),
+      }, false),
     );
   }
 }

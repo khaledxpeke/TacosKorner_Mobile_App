@@ -91,7 +91,7 @@ class _PackageScreenState extends State<PackageScreen> {
                               shrinkWrap: true,
                               itemCount: ingrediants.length,
                               itemBuilder: (BuildContext context, int index) {
-                                if (ingrediants[index]['name'] != "Seul") {
+                                if (ingrediants[index]['name'].toUpperCase()!= "SEUL") {
                                   return SideItem(
                                     ingrediants[index]['image'],
                                     ingrediants[index]['name'],
@@ -151,16 +151,16 @@ class _PackageScreenState extends State<PackageScreen> {
                                             return Row(
                                               children: [
                                                 CategoryItem(
-                                                  package['name'] == "Seul"
+                                                  package['name'].toUpperCase()== "SEUL"
                                                       ? ""
                                                       : package['image'],
                                                   package['name'],
-                                                  package['name'] == "Seul"
+                                                  package['name'].toUpperCase()== "SEUL"
                                                       ? null
                                                       : double.parse(
                                                           package['price']
                                                               .toString()),
-                                                  package['name'] == "Seul"
+                                                  package['name'].toUpperCase()== "SEUL"
                                                       ? null
                                                       : package['currency'],
                                                   () {

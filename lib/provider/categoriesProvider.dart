@@ -16,6 +16,7 @@ class Categories with ChangeNotifier {
   int nbSteps = 4;
   int stepIndex = 0;
   int lastStepIndex = 0;
+  Map<String, dynamic> lastProduct = {};
 
   final url = dotenv.env['API_URL'];
 
@@ -61,13 +62,19 @@ class Categories with ChangeNotifier {
 
   setProducts(Map<String, dynamic> products1) {
     products.add(products1);
+    lastProduct=products.last;
     notifyListeners();
   }
 
-  removeProduct() {
+  removeLastProduct() {
     if (products.isNotEmpty) {
       products.removeLast();
     }
+    notifyListeners();
+  }
+
+  removeProduct(Map<String, dynamic> products1) {
+    products.remove(products1);
     notifyListeners();
   }
 

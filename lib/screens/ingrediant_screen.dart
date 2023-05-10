@@ -167,7 +167,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                   context: context,
                                                   builder: ((context) {
                                                     return ErrorPopUp("Alert",
-                                                        "Il faut choisir que 2 selectedIngrediantss au maximum");
+                                                        "Il faut choisir que 2 sauces au maximum");
                                                   }));
                                             }
                                           } else {
