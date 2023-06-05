@@ -107,7 +107,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                               return ConfirmationItem(
                                 product['plat']['name'],
                                 products.length > 1 ? index + 1 : 0,
-                                product['plat']['price'],
+                                double.parse(product['plat']['price'].toString()),
                                 product['plat']['currency'],
                                 product['addons']
                                     .map((addons) => {

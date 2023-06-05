@@ -134,8 +134,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                                 ['products'][index]['image'],
                                             categories[selectedCategory]
                                                 ['products'][index]['name'],
+                                                double.parse(
                                             categories[selectedCategory]
-                                                ['products'][index]['price'],
+                                                ['products'][index]['price'].toString()),
                                             categories[selectedCategory]
                                                 ['products'][index]['currency'],
                                             () {
@@ -201,8 +202,8 @@ class _ProductScreenState extends State<ProductScreen> {
           Provider.of<Categories>(context, listen: false).setCategory(
               categories[selectedCategory]['products'][selectedProduct]);
           Provider.of<Categories>(context, listen: false).setTotal(
-              categories[selectedCategory]['products'][selectedProduct]
-                  ['price']);
+              double.parse(categories[selectedCategory]['products'][selectedProduct]
+                  ['price'].toString()));
           Provider.of<Categories>(context, listen: false).setStepIndex(1);
           if (type.isNotEmpty) {
             Provider.of<Ingredients>(context, listen: false).setTypes(type);

@@ -28,6 +28,7 @@ class IngrediantScreen extends StatefulWidget {
 class _IngrediantScreenState extends State<IngrediantScreen> {
   List<dynamic> selectedIngrediants = [];
   int nbsauce = 0;
+  int selectedMeat = 0;
   late ScrollController _scrollController;
 
   @override
@@ -45,6 +46,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
+    int nbMeat = category['maxIngrediant'] ?? 0;
+
     String type = Provider.of<Ingredients>(context).type;
     List<dynamic> ingrediants = Provider.of<Ingredients>(context).ingrediants;
     List<dynamic> types = Provider.of<Ingredients>(context).types;
@@ -116,7 +119,10 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                           ? "Je choisir mes viande"
                                           : type.toUpperCase() == 'OTHERS'
                                               ? "Je choisir mes salades"
-                                              : "")),
+                                              : type.toUpperCase() ==
+                                                      'SANS SAUCE'
+                                                  ? "Je choisir mes sans sauce"
+                                                  : "")),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -154,6 +160,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                           if (type.toUpperCase() == 'SAUCE') {
                                             nbsauce -= 1;
                                           }
+                                          if (type.toUpperCase() == 'MEAT') {
+                                            selectedMeat -= 1;
+                                          }
                                           selectedIngrediants
                                               .remove(ingrediantsData[index]);
                                         } else {
@@ -168,6 +177,20 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                   builder: ((context) {
                                                     return ErrorPopUp("Alert",
                                                         "Il faut choisir que 2 sauces au maximum");
+                                                  }));
+                                            }
+                                          } else if (type.toUpperCase() ==
+                                              'MEAT') {
+                                            if (selectedMeat < nbMeat) {
+                                              selectedIngrediants
+                                                  .add(ingrediantsData[index]);
+                                              selectedMeat += 1;
+                                            } else {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: ((context) {
+                                                    return ErrorPopUp("Alert",
+                                                        "Il faut choisir que $nbMeat type de viande au maximum");
                                                   }));
                                             }
                                           } else {
@@ -214,9 +237,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
       }, () {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
-        if(type.toUpperCase() == 'SAUCE'){
+        if (type.toUpperCase() == 'SAUCE') {
           setState(() {
-            nbsauce=0;
+            nbsauce = 0;
           });
         }
         if (index > 0) {
@@ -229,7 +252,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         } else {
           Navigator.of(context).pop();
         }
-      },false),
+      }, false),
     );
   }
 }

@@ -132,7 +132,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                     return CategoryItem(
                                         supplementsData[index]['image'],
                                         supplementsData[index]['name'],
-                                        supplementsData[index]['price'],
+                                        double.parse(supplementsData[index]['price'].toString()),
                                         supplementsData[index]['currency'], () {
                                       setState(() {
                                         if (supplements

@@ -158,7 +158,7 @@ class _DessertScreenState extends State<DessertScreen> {
                                               return CategoryItem(
                                                   dessertsData[index]['image'],
                                                   dessertsData[index]['name'],
-                                                  dessertsData[index]['price'],
+                                                  double.parse(dessertsData[index]['price'].toString()),
                                                   dessertsData[index]
                                                       ['currency'], () {
                                                 setState(() {
