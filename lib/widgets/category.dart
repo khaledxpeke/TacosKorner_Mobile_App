@@ -51,7 +51,9 @@ class CategoryItem extends StatelessWidget {
           SizedBox(height: 12.h),
           Text(
             name,
+            textAlign: TextAlign.center,
             style: TextStyle(
+              
                 fontWeight: FontWeight.w800,
                 fontSize: 9.sp,
                 color: selected ? lightColor : textColor),

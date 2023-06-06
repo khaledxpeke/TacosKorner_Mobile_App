@@ -49,6 +49,7 @@ class SideItem extends StatelessWidget {
           ),
           Text(
             name,
+            textAlign: TextAlign.center,
             style: TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 9.sp,

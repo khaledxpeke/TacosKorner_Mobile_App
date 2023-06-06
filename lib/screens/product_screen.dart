@@ -134,9 +134,11 @@ class _ProductScreenState extends State<ProductScreen> {
                                                 ['products'][index]['image'],
                                             categories[selectedCategory]
                                                 ['products'][index]['name'],
-                                                double.parse(
-                                            categories[selectedCategory]
-                                                ['products'][index]['price'].toString()),
+                                            double.parse(
+                                                categories[selectedCategory]
+                                                            ['products'][index]
+                                                        ['price']
+                                                    .toString()),
                                             categories[selectedCategory]
                                                 ['products'][index]['currency'],
                                             () {
@@ -201,9 +203,9 @@ class _ProductScreenState extends State<ProductScreen> {
               [selectedProduct]['supplements'];
           Provider.of<Categories>(context, listen: false).setCategory(
               categories[selectedCategory]['products'][selectedProduct]);
-          Provider.of<Categories>(context, listen: false).setTotal(
-              double.parse(categories[selectedCategory]['products'][selectedProduct]
-                  ['price'].toString()));
+          Provider.of<Categories>(context, listen: false).setTotal(double.parse(
+              categories[selectedCategory]['products'][selectedProduct]['price']
+                  .toString()));
           Provider.of<Categories>(context, listen: false).setStepIndex(1);
           if (type.isNotEmpty) {
             Provider.of<Ingredients>(context, listen: false).setTypes(type);
@@ -231,7 +233,7 @@ class _ProductScreenState extends State<ProductScreen> {
       }, () {
         Provider.of<Categories>(context, listen: false).setStepIndex(0);
         Navigator.of(context).pop();
-      },false),
+      }, false),
     );
   }
 }

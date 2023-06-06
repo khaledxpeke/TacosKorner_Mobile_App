@@ -121,7 +121,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               ? "Je choisir mes salades"
                                               : type.toUpperCase() ==
                                                       'SANS SAUCE'
-                                                  ? "Je choisir mes sans sauce"
+                                                  ? "si vous voulez enlever quelque ingrédient"
                                                   : "")),
                           Expanded(
                             child: SingleChildScrollView(
