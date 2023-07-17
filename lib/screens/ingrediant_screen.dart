@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/screens/package_screen.dart';
+import 'package:takos_korner/screens/extra_screen.dart';
 import 'package:takos_korner/screens/supplements_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,6 +49,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
     int nbMeat = category['maxIngrediant'] ?? 0;
 
     String type = Provider.of<Ingredients>(context).type;
+    String message = Provider.of<Ingredients>(context).message;
     List<dynamic> ingrediants = Provider.of<Ingredients>(context).ingrediants;
     List<dynamic> types = Provider.of<Ingredients>(context).types;
     int index = Provider.of<Ingredients>(context).index;
@@ -113,16 +114,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                               builder: (context, categories, _) => TopSide(
                                   category['name'],
                                   categories.stepIndex,
-                                  type.toUpperCase() == 'SAUCE'
-                                      ? "Je choisir mes sauces"
-                                      : type.toUpperCase() == 'MEAT'
-                                          ? "Je choisir mes viande"
-                                          : type.toUpperCase() == 'OTHERS'
-                                              ? "Je choisir mes salades"
-                                              : type.toUpperCase() ==
-                                                      'SANS SAUCE'
-                                                  ? "si vous voulez enlever quelque ingrédient"
-                                                  : "")),
+                                  message)),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -222,7 +214,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
             .setStepIndex(stepIndex + 1);
         if (types.length - 1 > index) {
           Provider.of<Ingredients>(context, listen: false)
-              .setType(types[index + 1]['name'], index + 1);
+              .setType(types[index + 1]['name'],types[index+1]['message'], index + 1);
         } else {
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(selectedIngrediants);
@@ -231,7 +223,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                 MaterialPageRoute(builder: (context) => SupplementsScreen()));
           } else {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PackageScreen()));
+                MaterialPageRoute(builder: (context) => ExtraScreen()));
           }
         }
       }, () {
@@ -248,7 +240,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                 (ingrediant) => ingrediant['type']['name'] == type);
           });
           Provider.of<Ingredients>(context, listen: false)
-              .setType(types[index - 1]['name'], index - 1);
+              .setType(types[index - 1]['name'],types[index-1]['message'], index - 1);
         } else {
           Navigator.of(context).pop();
         }

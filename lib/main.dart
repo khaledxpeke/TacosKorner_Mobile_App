@@ -7,8 +7,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/dessertProvider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
+import 'package:takos_korner/provider/drinkProvider.dart';
 import 'package:takos_korner/provider/ingrediantProvider.dart';
-import 'package:takos_korner/provider/packageProvider.dart';
+import 'package:takos_korner/provider/extraProvider.dart';
 import 'package:takos_korner/provider/suppelementsProvider.dart';
 import 'package:takos_korner/screens/splash_screen.dart';
 import 'screens/Home_screen.dart';
@@ -22,9 +23,10 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => Categories()),
       ChangeNotifierProvider(create: (_) => Deserts()),
+      ChangeNotifierProvider(create: (_) => Drinks()),
       ChangeNotifierProvider(create: (_) => Ingredients()),
       ChangeNotifierProvider(create: (_) => Supplements()),
-      ChangeNotifierProvider(create: (_) => Package()),
+      ChangeNotifierProvider(create: (_) => Extra()),
     ],
     child: MyApp(),
   ));

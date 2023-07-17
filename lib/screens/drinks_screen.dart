@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/provider/dessertProvider.dart';
-import 'package:takos_korner/screens/confiramtion_screen.dart';
+import 'package:takos_korner/provider/drinkProvider.dart';
+import 'package:takos_korner/screens/dessert_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/totalAndItems.dart';
@@ -17,19 +17,19 @@ import '../widgets/loading.dart';
 import '../widgets/sideItem.dart';
 import '../widgets/topSide.dart';
 
-class DessertScreen extends StatefulWidget {
-  const DessertScreen({Key? key}) : super(key: key);
+class DrinkScreen extends StatefulWidget {
+  const DrinkScreen({Key? key}) : super(key: key);
 
-  static const routeName = "/DessertScreen";
+  static const routeName = "/DrinksScreen";
 
   @override
-  State<DessertScreen> createState() => _DessertScreenState();
+  State<DrinkScreen> createState() => _DrinkScreenState();
 }
 
-class _DessertScreenState extends State<DessertScreen> {
+class _DrinkScreenState extends State<DrinkScreen> {
   late ScrollController _scrollController;
-  List<dynamic> selectedDessert = [];
-  List<dynamic> desserts = [];
+  List<dynamic> selectedDrink = [];
+  List<dynamic> drinks = [];
   double newTotal = 0;
   double lastTotal = 0;
   bool _isLoading = true;
@@ -43,7 +43,7 @@ class _DessertScreenState extends State<DessertScreen> {
   }
 
   void loadData() async {
-    String result = await context.read<Deserts>().getDeserts();
+    String result = await context.read<Drinks>().getDrinks();
     setState(() {
       _isLoading = false;
       if (result != "success") {
@@ -61,7 +61,7 @@ class _DessertScreenState extends State<DessertScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    desserts = Provider.of<Ingredients>(context).selectedIngrediants;
+    drinks = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     return Scaffold(
@@ -94,11 +94,11 @@ class _DessertScreenState extends State<DessertScreen> {
                             child: ListView.builder(
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: desserts.length,
+                              itemCount: drinks.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return SideItem(
-                                  desserts[index]['image'],
-                                  desserts[index]['name'],
+                                  drinks[index]['image'],
+                                  drinks[index]['name'],
                                   () {},
                                   false,
                                 );
@@ -107,7 +107,7 @@ class _DessertScreenState extends State<DessertScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(newTotal + total, desserts.length),
+                      TotalAndItems(newTotal + total, drinks.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -120,7 +120,7 @@ class _DessertScreenState extends State<DessertScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TopSide(category['name'], stepIndex,
-                              "Oh il vous manque que le dessert!"),
+                              "Je choisir mes boissons"),
                           _isLoading
                               ? LoadingWidget()
                               : errorMessage != ""
@@ -136,8 +136,8 @@ class _DessertScreenState extends State<DessertScreen> {
                                                 NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemCount: context
-                                                .watch<Deserts>()
-                                                .deserts
+                                                .watch<Drinks>()
+                                                .drinks
                                                 .length,
                                             gridDelegate:
                                                 SliverGridDelegateWithFixedCrossAxisCount(
@@ -147,42 +147,40 @@ class _DessertScreenState extends State<DessertScreen> {
                                             ),
                                             itemBuilder: (BuildContext context,
                                                 int index) {
-                                              List<dynamic> dessertsData =
-                                                  context
-                                                      .watch<Deserts>()
-                                                      .deserts;
+                                              List<dynamic> drinksData = context
+                                                  .watch<Drinks>()
+                                                  .drinks;
                                               return CategoryItem(
-                                                  dessertsData[index]['image'],
-                                                  dessertsData[index]['name'],
-                                                  double.parse(
-                                                      dessertsData[index]
-                                                              ['price']
-                                                          .toString()),
-                                                  dessertsData[index]
-                                                      ['currency'], () {
+                                                  drinksData[index]['image'],
+                                                  drinksData[index]['name'],
+                                                  double.parse(drinksData[index]
+                                                          ['price']
+                                                      .toString()),
+                                                  drinksData[index]['currency'],
+                                                  () {
                                                 setState(() {
-                                                  if (selectedDessert.contains(
-                                                      dessertsData[index])) {
+                                                  if (selectedDrink.contains(
+                                                      drinksData[index])) {
                                                     newTotal -=
-                                                        dessertsData[index]
+                                                        drinksData[index]
                                                             ['price'];
-                                                    selectedDessert.remove(
-                                                        dessertsData[index]);
-                                                    desserts.remove(
-                                                        dessertsData[index]);
+                                                    selectedDrink.remove(
+                                                        drinksData[index]);
+                                                    drinks.remove(
+                                                        drinksData[index]);
                                                   } else {
                                                     newTotal +=
-                                                        dessertsData[index]
+                                                        drinksData[index]
                                                             ['price'];
-                                                    selectedDessert.add(
-                                                        dessertsData[index]);
-                                                    desserts.add(
-                                                        dessertsData[index]);
+                                                    selectedDrink
+                                                        .add(drinksData[index]);
+                                                    drinks
+                                                        .add(drinksData[index]);
                                                   }
                                                 });
                                               },
-                                                  desserts.contains(
-                                                      dessertsData[index]));
+                                                  drinks.contains(
+                                                      drinksData[index]));
                                             },
                                           ),
                                         ),
@@ -202,25 +200,23 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(desserts);
+            .setSelectedIngrediants(drinks);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
-        Provider.of<Categories>(context, listen: false).setProducts(
-            {"plat": category, "addons": desserts, "total": total + newTotal});
         setState(() {
           lastTotal = newTotal;
           newTotal = 0;
         });
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ConfirmationScreen()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => DessertScreen()));
       }, () {
         Provider.of<Categories>(context, listen: false)
             .setTotal(total - lastTotal);
         setState(() {
-          desserts.removeWhere((item) => selectedDessert.contains(item));
+          drinks.removeWhere((item) => selectedDrink.contains(item));
         });
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(desserts);
+            .setSelectedIngrediants(drinks);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();

@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
 import 'package:takos_korner/provider/suppelementsProvider.dart';
+import 'package:takos_korner/screens/confiramtion_screen.dart';
 import 'package:takos_korner/screens/ingrediant_screen.dart';
-import 'package:takos_korner/screens/package_screen.dart';
+import 'package:takos_korner/screens/extra_screen.dart';
 import 'package:takos_korner/screens/supplements_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/Error_popup.dart';
@@ -149,7 +150,18 @@ class _ProductScreenState extends State<ProductScreen> {
                                                   selectedProduct = index;
                                                 }
                                               });
-                                              int nbSteps = (4 +
+                                              int nb = 2;
+                                              if (categories[selectedCategory]
+                                                                  ['products']
+                                                              [selectedProduct]
+                                                          ['choice']
+                                                      .toUpperCase() ==
+                                                  "SEUL") {
+                                                nb = 2;
+                                              } else {
+                                                nb = 5;
+                                              }
+                                              int nbSteps = (nb +
                                                       (categories[selectedCategory]
                                                                           ['products']
                                                                       [index][
@@ -207,10 +219,22 @@ class _ProductScreenState extends State<ProductScreen> {
               categories[selectedCategory]['products'][selectedProduct]['price']
                   .toString()));
           Provider.of<Categories>(context, listen: false).setStepIndex(1);
-          if (type.isNotEmpty) {
+          if (categories[selectedCategory]['products'][selectedProduct]
+                      ['choice']
+                  .toUpperCase() ==
+              "SEUL") {
+            Provider.of<Categories>(context, listen: false).setProducts({
+              "plat": categories[selectedCategory]['products'][selectedProduct],
+              "addons": [],
+              "total": categories[selectedCategory]['products'][selectedProduct]
+                  ['price']
+            });
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ConfirmationScreen()));
+          } else if (type.isNotEmpty) {
             Provider.of<Ingredients>(context, listen: false).setTypes(type);
             Provider.of<Ingredients>(context, listen: false)
-                .setType(type[0]['name'], 0);
+                .setType(type[0]['name'], type[0]['message'], 0);
             Provider.of<Ingredients>(context, listen: false).setIngrediants(
                 categories[selectedCategory]['products'][selectedProduct]
                     ['ingrediants']);
@@ -227,7 +251,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 MaterialPageRoute(builder: (context) => SupplementsScreen()));
           } else {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PackageScreen()));
+                MaterialPageRoute(builder: (context) => ExtraScreen()));
           }
         }
       }, () {

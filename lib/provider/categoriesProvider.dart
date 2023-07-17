@@ -13,7 +13,7 @@ class Categories with ChangeNotifier {
   String formule = "";
   double total = 0;
   List<dynamic> products = [];
-  int nbSteps = 4;
+  int nbSteps = 2;
   int stepIndex = 0;
   int lastStepIndex = 0;
   Map<String, dynamic> lastProduct = {};
@@ -34,7 +34,7 @@ class Categories with ChangeNotifier {
     } on SocketException {
       return "Impossible d'accéder à Internet!";
     } on FormatException {
-      return "Une erreur s'est produite";
+      return "Une erreur est survenue";
     } catch (exception) {
       return exception.toString();
     }

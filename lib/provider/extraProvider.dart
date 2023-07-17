@@ -6,17 +6,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-class Deserts with ChangeNotifier {
-  List<dynamic> deserts = [];
+class Extra with ChangeNotifier {
+  List<dynamic> extras = [];
 
   final url = dotenv.env['API_URL'];
 
-  Future<String> getDeserts() async {
+  Future<String> getExtra() async {
     try {
-      final response = await http.get(Uri.parse("$url/desert"));
+      final response = await http.get(Uri.parse("$url/extra"));
       final body = json.decode(response.body);
       if (response.statusCode == 200) {
-        deserts = body;
+        extras = body;
         notifyListeners();
         return "success";
       } else {

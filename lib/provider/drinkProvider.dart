@@ -6,17 +6,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-class Package with ChangeNotifier {
-  List<dynamic> packages = [];
+class Drinks with ChangeNotifier {
+  List<dynamic> drinks = [];
 
   final url = dotenv.env['API_URL'];
 
-  Future<String> getPackage() async {
+  Future<String> getDrinks() async {
     try {
-      final response = await http.get(Uri.parse("$url/pack"));
+      final response = await http.get(Uri.parse("$url/drink"));
       final body = json.decode(response.body);
       if (response.statusCode == 200) {
-        packages = body;
+        drinks = body;
         notifyListeners();
         return "success";
       } else {
@@ -25,7 +25,7 @@ class Package with ChangeNotifier {
     } on SocketException {
       return "Impossible d'accéder à Internet!";
     } on FormatException {
-      return "Une erreur s'est produite";
+      return "Une erreur est survenue";
     } catch (exception) {
       return exception.toString();
     }

@@ -25,7 +25,7 @@ class Histories {
     } on SocketException{
       return "Impossible d'accéder à Internet!";
     } on FormatException {
-      return "Une erreur s'est produite";
+      return "Une erreur est survenue";
     } catch (exception) {
       return exception.toString();
     }

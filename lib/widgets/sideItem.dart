@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, file_names
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -38,9 +40,20 @@ class SideItem extends StatelessWidget {
             child: image == ""
                 ? Container()
                 : image!.startsWith("uploads")
-                    ? Image.network(
-                        "$url/$image",
+                    ? CachedNetworkImage(
+                        imageUrl: "$url/$image",
                         fit: BoxFit.cover,
+                        errorWidget: (_, __, ___) {
+                          return Image.asset(
+                            "assets/images/logo.png",
+                            fit: BoxFit.cover,
+                          );
+                        },
+                        placeholder: (context, url) {
+                          return Center(
+                              child: LoadingAnimationWidget.inkDrop(
+                                  color: primaryColor, size: 25.w));
+                        },
                       )
                     : Image.network(
                         image!,

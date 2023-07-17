@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
 import 'package:takos_korner/provider/suppelementsProvider.dart';
-import 'package:takos_korner/screens/package_screen.dart';
+import 'package:takos_korner/screens/extra_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:takos_korner/widgets/totalAndItems.dart';
@@ -182,7 +182,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
           newTotal = 0;
         });
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PackageScreen()));
+            context, MaterialPageRoute(builder: (context) => ExtraScreen()));
       }, () {
         Provider.of<Categories>(context, listen: false)
             .setTotal(total - lastTotal);
