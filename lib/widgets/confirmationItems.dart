@@ -12,7 +12,7 @@ class ConfirmationItem extends StatelessWidget {
   double price;
   List<dynamic> items;
   VoidCallback deletePlat;
-  VoidCallback removeAddon;
+  Function(dynamic selectedAddon) removeAddon;
 
   ConfirmationItem(
     this.plat,
@@ -68,11 +68,11 @@ class ConfirmationItem extends StatelessWidget {
             ),
           ]),
           SizedBox(height: 5.h),
-          Text(
+          items.isNotEmpty? Text(
             'Addons',
             style: TextStyle(
                 fontWeight: FontWeight.w800, fontSize: 11.sp, color: textColor),
-          ),
+          ):Container(),
           Padding(
             padding: EdgeInsets.only(top: 5.h),
             child: Column(
@@ -99,7 +99,7 @@ class ConfirmationItem extends StatelessWidget {
                           ),
                           SizedBox(width: 4.w),
                           GestureDetector(
-                            onTap: removeAddon,
+                            onTap: () => removeAddon(item),
                             child: Text(
                               '-',
                               style: TextStyle(

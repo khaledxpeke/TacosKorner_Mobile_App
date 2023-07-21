@@ -47,6 +47,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     // int lastStepIndex = Provider.of<Categories>(context).lastStepIndex;
+    List<dynamic> products = Provider.of<Categories>(context).products;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -125,14 +126,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
               MaterialPageRoute(builder: (context) => ProductScreen()));
         }
       }, () {
-        Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomeScreen()));
+        if (products.isEmpty) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        }
         // if (lastStepIndex > 0) {
         //   Provider.of<Categories>(context, listen: false)
         //       .setStepIndex(lastStepIndex);
         // }
         // Navigator.of(context).pop();
-      },false),
+      }, false),
     );
   }
 }

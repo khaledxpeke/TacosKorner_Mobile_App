@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 class Categories with ChangeNotifier {
   List<dynamic> categories = [];
   Map<String, dynamic> category = {};
+  Map<String, dynamic> addon = {};
   int selectedCategory = -1;
   String formule = "";
   double total = 0;
@@ -62,7 +63,7 @@ class Categories with ChangeNotifier {
 
   setProducts(Map<String, dynamic> products1) {
     products.add(products1);
-    lastProduct=products.last;
+    lastProduct = products.last;
     notifyListeners();
   }
 
@@ -75,6 +76,19 @@ class Categories with ChangeNotifier {
 
   removeProduct(Map<String, dynamic> products1) {
     products.remove(products1);
+    notifyListeners();
+  }
+
+  removeAddon(int productIndex, Map<String, dynamic> addon1) {
+    double removedAddonPrice = 0.0;
+    products[productIndex]['addons'].removeWhere((addon) {
+      if (addon['name'] == addon1['name']) {
+      removedAddonPrice = addon['price']?.toDouble() ?? 0.0;
+      return true;
+    }
+    return false;
+    });
+    products[productIndex]['total'] -= removedAddonPrice;
     notifyListeners();
   }
 

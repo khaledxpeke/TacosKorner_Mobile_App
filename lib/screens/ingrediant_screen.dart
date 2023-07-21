@@ -234,6 +234,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
             nbsauce = 0;
           });
         }
+        if (type.toUpperCase() == 'MEAT') {
+          setState(() {
+            selectedMeat = 0;
+          });
+        }
         if (index > 0) {
           setState(() {
             selectedIngrediants.removeWhere(

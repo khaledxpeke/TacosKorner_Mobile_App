@@ -49,9 +49,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     Map<String, dynamic> lastProduct =
         Provider.of<Categories>(context).lastProduct;
     String formule = Provider.of<Categories>(context).formule;
-    setState(() {
-      confirmationTotal = 0.0;
-    });
+    confirmationTotal =
+        products.fold(0.0, (sum, product) => sum + product['total']);
+    currency = products.isNotEmpty ? products.first['plat']['currency'] : "DT";
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -105,10 +105,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                     final int index = entry.key;
                                     final Map<String, dynamic> product =
                                         entry.value;
-                                    setState(() {
-                                      confirmationTotal += product['total'];
-                                      currency = product['plat']['currency'];
-                                    });
                                     return ConfirmationItem(
                                       product['plat']['name'],
                                       products.length > 1 ? index + 1 : 0,
@@ -153,22 +149,25 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                           }),
                                         );
                                       },
-                                      () {
+                                      (selectedAddon) {
                                         showDialog(
                                           context: context,
                                           builder: ((context) {
                                             return ConfirmationMessage(
                                               "Alert",
-                                              "Vous êtes sûr que vous voulez retirer ce addons!",
+                                              "Vous êtes sûr que vous voulez retirer cet addon ?",
                                               () {
                                                 setState(() {
-                                                  confirmationTotal -=
-                                                      product['total'];
+                                                  if (selectedAddon['price'] !=
+                                                      "Free") {
+                                                    confirmationTotal -=
+                                                        selectedAddon['price'];
+                                                  }
                                                   Provider.of<Categories>(
                                                           context,
                                                           listen: false)
-                                                      .removeProduct(product);
-                                                  products.remove(product);
+                                                      .removeAddon(
+                                                          index, selectedAddon);
                                                 });
                                                 Navigator.of(context).pop();
                                               },
@@ -301,7 +300,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           Provider.of<Categories>(context, listen: false).setStepIndex(0);
         } else if (lastProduct == products.last) {
           Provider.of<Categories>(context, listen: false).removeLastProduct();
-
+          Provider.of<Categories>(context, listen: false)
+              .setStepIndex(stepIndex - 1);
+          Navigator.of(context).pop();
+        } else {
           Provider.of<Categories>(context, listen: false)
               .setStepIndex(stepIndex - 1);
           Navigator.of(context).pop();
