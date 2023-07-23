@@ -106,11 +106,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                     final Map<String, dynamic> product =
                                         entry.value;
                                     return ConfirmationItem(
-                                      product['plat']['name'],
+                                      product,
                                       products.length > 1 ? index + 1 : 0,
-                                      double.parse(
-                                          product['plat']['price'].toString()),
-                                      product['plat']['currency'],
                                       product['addons']
                                           .map((addons) => {
                                                 "name": addons['name'],

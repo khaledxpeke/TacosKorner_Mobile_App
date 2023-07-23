@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
+import '../provider/categoriesProvider.dart';
 import '../utils/colors.dart';
 
 class ConfirmationItem extends StatelessWidget {
-  String plat;
+  Map<String, dynamic> plat;
   int platNumber;
-  String currency;
-  double price;
   List<dynamic> items;
   VoidCallback deletePlat;
   Function(dynamic selectedAddon) removeAddon;
@@ -17,8 +17,6 @@ class ConfirmationItem extends StatelessWidget {
   ConfirmationItem(
     this.plat,
     this.platNumber,
-    this.price,
-    this.currency,
     this.items,
     this.deletePlat,
     this.removeAddon,
@@ -26,6 +24,8 @@ class ConfirmationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> lastProduct =
+        Provider.of<Categories>(context).lastProduct;
     return Padding(
       padding: EdgeInsets.only(bottom: 5.h),
       child: Column(
@@ -53,14 +53,14 @@ class ConfirmationItem extends StatelessWidget {
           SizedBox(height: 5.h),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text(
-              plat,
+              plat['plat']['name'],
               style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 10.sp,
                   color: textColor),
             ),
             Text(
-              "$price$currency",
+              "${double.parse(plat['plat']['price'].toString())}${plat['plat']['currency']}",
               style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 10.sp,
@@ -68,11 +68,15 @@ class ConfirmationItem extends StatelessWidget {
             ),
           ]),
           SizedBox(height: 5.h),
-          items.isNotEmpty? Text(
-            'Addons',
-            style: TextStyle(
-                fontWeight: FontWeight.w800, fontSize: 11.sp, color: textColor),
-          ):Container(),
+          items.isNotEmpty
+              ? Text(
+                  'Addons',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11.sp,
+                      color: textColor),
+                )
+              : Container(),
           Padding(
             padding: EdgeInsets.only(top: 5.h),
             child: Column(
@@ -97,17 +101,21 @@ class ConfirmationItem extends StatelessWidget {
                               color: textColor,
                             ),
                           ),
-                          SizedBox(width: 4.w),
-                          GestureDetector(
-                            onTap: () => removeAddon(item),
-                            child: Text(
-                              '-',
-                              style: TextStyle(
-                                  color: redColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 26),
-                            ),
-                          )
+                          lastProduct == plat
+                              ? Container()
+                              : GestureDetector(
+                                  onTap: () => removeAddon(item),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 4.w),
+                                    child: Text(
+                                      '-',
+                                      style: TextStyle(
+                                          color: redColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 26),
+                                    ),
+                                  ),
+                                )
                         ],
                       ),
                     ]);
