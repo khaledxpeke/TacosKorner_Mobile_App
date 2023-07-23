@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:takos_korner/screens/Home_screen.dart';
 import 'package:takos_korner/screens/product_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/appbar.dart';
@@ -45,7 +46,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    int lastStepIndex = Provider.of<Categories>(context).lastStepIndex;
+    // int lastStepIndex = Provider.of<Categories>(context).lastStepIndex;
+    List<dynamic> products = Provider.of<Categories>(context).products;
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -124,12 +126,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
               MaterialPageRoute(builder: (context) => ProductScreen()));
         }
       }, () {
-        if (lastStepIndex > 0) {
-          Provider.of<Categories>(context, listen: false)
-              .setStepIndex(lastStepIndex);
+        if (products.isEmpty) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
         }
-        Navigator.of(context).pop();
-      },false),
+        // if (lastStepIndex > 0) {
+        //   Provider.of<Categories>(context, listen: false)
+        //       .setStepIndex(lastStepIndex);
+        // }
+        // Navigator.of(context).pop();
+      }, false),
     );
   }
 }

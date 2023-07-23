@@ -11,7 +11,8 @@ class ConfirmationItem extends StatelessWidget {
   String currency;
   double price;
   List<dynamic> items;
-  VoidCallback onPressed;
+  VoidCallback deletePlat;
+  Function(dynamic selectedAddon) removeAddon;
 
   ConfirmationItem(
     this.plat,
@@ -19,7 +20,8 @@ class ConfirmationItem extends StatelessWidget {
     this.price,
     this.currency,
     this.items,
-    this.onPressed,
+    this.deletePlat,
+    this.removeAddon,
   );
 
   @override
@@ -40,7 +42,7 @@ class ConfirmationItem extends StatelessWidget {
                     color: textColor),
               ),
               IconButton(
-                onPressed: onPressed,
+                onPressed: deletePlat,
                 icon: Icon(
                   Icons.close,
                   size: 15.sp,
@@ -66,11 +68,11 @@ class ConfirmationItem extends StatelessWidget {
             ),
           ]),
           SizedBox(height: 5.h),
-          Text(
+          items.isNotEmpty? Text(
             'Addons',
             style: TextStyle(
                 fontWeight: FontWeight.w800, fontSize: 11.sp, color: textColor),
-          ),
+          ):Container(),
           Padding(
             padding: EdgeInsets.only(top: 5.h),
             child: Column(
@@ -85,12 +87,28 @@ class ConfirmationItem extends StatelessWidget {
                             fontSize: 10.sp,
                             color: textColor),
                       ),
-                      Text(
-                        "${item['price']}${item['currency']}",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10.sp,
-                            color: textColor),
+                      Row(
+                        children: [
+                          Text(
+                            "${item['price']}${item['currency']}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10.sp,
+                              color: textColor,
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          GestureDetector(
+                            onTap: () => removeAddon(item),
+                            child: Text(
+                              '-',
+                              style: TextStyle(
+                                  color: redColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 26),
+                            ),
+                          )
+                        ],
                       ),
                     ]);
               }).toList(),

@@ -1,35 +1,34 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/provider/dessertProvider.dart';
-import 'package:takos_korner/screens/confiramtion_screen.dart';
+import 'package:takos_korner/provider/ingrediantProvider.dart';
+import 'package:takos_korner/provider/extraProvider.dart';
+import 'package:takos_korner/screens/drinks_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:takos_korner/widgets/bottomsheet.dart';
+import 'package:takos_korner/widgets/category.dart';
+import 'package:takos_korner/widgets/topSide.dart';
 import 'package:takos_korner/widgets/totalAndItems.dart';
-import '../provider/ingrediantProvider.dart';
 import '../widgets/appbar.dart';
-import '../widgets/bottomsheet.dart';
-import '../widgets/category.dart';
 import '../widgets/error_meesage.dart';
 import '../widgets/loading.dart';
 import '../widgets/sideItem.dart';
-import '../widgets/topSide.dart';
 
-class DessertScreen extends StatefulWidget {
-  const DessertScreen({Key? key}) : super(key: key);
-
-  static const routeName = "/DessertScreen";
+class ExtraScreen extends StatefulWidget {
+  const ExtraScreen({super.key});
+  static const routeName = "/ExtraScreen";
 
   @override
-  State<DessertScreen> createState() => _DessertScreenState();
+  State<ExtraScreen> createState() => _ExtraScreenState();
 }
 
-class _DessertScreenState extends State<DessertScreen> {
+class _ExtraScreenState extends State<ExtraScreen> {
   late ScrollController _scrollController;
-  List<dynamic> selectedDessert = [];
-  List<dynamic> desserts = [];
+  List<dynamic> selectedExtra = [];
+  List<dynamic> extras = [];
   double newTotal = 0;
   double lastTotal = 0;
   bool _isLoading = true;
@@ -43,7 +42,7 @@ class _DessertScreenState extends State<DessertScreen> {
   }
 
   void loadData() async {
-    String result = await context.read<Deserts>().getDeserts();
+    String result = await context.read<Extra>().getExtra();
     setState(() {
       _isLoading = false;
       if (result != "success") {
@@ -61,7 +60,7 @@ class _DessertScreenState extends State<DessertScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    desserts = Provider.of<Ingredients>(context).selectedIngrediants;
+    extras = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     return Scaffold(
@@ -94,11 +93,11 @@ class _DessertScreenState extends State<DessertScreen> {
                             child: ListView.builder(
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: desserts.length,
+                              itemCount: extras.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return SideItem(
-                                  desserts[index]['image'],
-                                  desserts[index]['name'],
+                                  extras[index]['image'],
+                                  extras[index]['name'],
                                   () {},
                                   false,
                                 );
@@ -107,7 +106,7 @@ class _DessertScreenState extends State<DessertScreen> {
                           ),
                         ),
                       ),
-                      TotalAndItems(newTotal + total, desserts.length),
+                      TotalAndItems(newTotal + total, extras.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -120,7 +119,7 @@ class _DessertScreenState extends State<DessertScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TopSide(category['name'], stepIndex,
-                              "Oh il vous manque que le dessert!"),
+                              "Je choisir mes extra"),
                           _isLoading
                               ? LoadingWidget()
                               : errorMessage != ""
@@ -136,8 +135,8 @@ class _DessertScreenState extends State<DessertScreen> {
                                                 NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemCount: context
-                                                .watch<Deserts>()
-                                                .deserts
+                                                .watch<Extra>()
+                                                .extras
                                                 .length,
                                             gridDelegate:
                                                 SliverGridDelegateWithFixedCrossAxisCount(
@@ -147,42 +146,40 @@ class _DessertScreenState extends State<DessertScreen> {
                                             ),
                                             itemBuilder: (BuildContext context,
                                                 int index) {
-                                              List<dynamic> dessertsData =
-                                                  context
-                                                      .watch<Deserts>()
-                                                      .deserts;
+                                              List<dynamic> extrasData = context
+                                                  .watch<Extra>()
+                                                  .extras;
                                               return CategoryItem(
-                                                  dessertsData[index]['image'],
-                                                  dessertsData[index]['name'],
-                                                  double.parse(
-                                                      dessertsData[index]
-                                                              ['price']
-                                                          .toString()),
-                                                  dessertsData[index]
-                                                      ['currency'], () {
+                                                  extrasData[index]['image'],
+                                                  extrasData[index]['name'],
+                                                  double.parse(extrasData[index]
+                                                          ['price']
+                                                      .toString()),
+                                                  extrasData[index]['currency'],
+                                                  () {
                                                 setState(() {
-                                                  if (selectedDessert.contains(
-                                                      dessertsData[index])) {
+                                                  if (selectedExtra.contains(
+                                                      extrasData[index])) {
                                                     newTotal -=
-                                                        dessertsData[index]
+                                                        extrasData[index]
                                                             ['price'];
-                                                    selectedDessert.remove(
-                                                        dessertsData[index]);
-                                                    desserts.remove(
-                                                        dessertsData[index]);
+                                                    selectedExtra.remove(
+                                                        extrasData[index]);
+                                                    extras.remove(
+                                                        extrasData[index]);
                                                   } else {
                                                     newTotal +=
-                                                        dessertsData[index]
+                                                        extrasData[index]
                                                             ['price'];
-                                                    selectedDessert.add(
-                                                        dessertsData[index]);
-                                                    desserts.add(
-                                                        dessertsData[index]);
+                                                    selectedExtra
+                                                        .add(extrasData[index]);
+                                                    extras
+                                                        .add(extrasData[index]);
                                                   }
                                                 });
                                               },
-                                                  desserts.contains(
-                                                      dessertsData[index]));
+                                                  extras.contains(
+                                                      extrasData[index]));
                                             },
                                           ),
                                         ),
@@ -202,25 +199,23 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(desserts);
+            .setSelectedIngrediants(extras);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
-        Provider.of<Categories>(context, listen: false).setProducts(
-            {"plat": category, "addons": desserts, "total": total + newTotal});
         setState(() {
           lastTotal = newTotal;
           newTotal = 0;
         });
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ConfirmationScreen()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => DrinkScreen()));
       }, () {
         Provider.of<Categories>(context, listen: false)
             .setTotal(total - lastTotal);
         setState(() {
-          desserts.removeWhere((item) => selectedDessert.contains(item));
+          extras.removeWhere((item) => selectedExtra.contains(item));
         });
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(desserts);
+            .setSelectedIngrediants(extras);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
