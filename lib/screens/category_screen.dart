@@ -101,7 +101,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                       }
                                     });
                                   },
-                                  index == selectedCategory,
+                                  index == selectedCategory,false,(){},1
                                 );
                               },
                             ),

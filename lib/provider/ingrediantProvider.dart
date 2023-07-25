@@ -7,6 +7,7 @@ class Ingredients with ChangeNotifier {
   List<dynamic> types = [];
   String type = "";
   String message = "";
+  int max = 1;
   List<dynamic> ingrediants = [];
   int index = 0;
 
@@ -21,9 +22,10 @@ class Ingredients with ChangeNotifier {
     notifyListeners();
   }
 
-  setType(String type1,String message1,int indx) {
+  setType(String type1,String message1,int max1,int indx) {
     type = type1;
     message = message1;
+    max = max1;
     index = indx;
     notifyListeners();
   }

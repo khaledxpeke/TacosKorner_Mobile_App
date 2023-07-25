@@ -83,6 +83,7 @@ class _DessertScreenState extends State<DessertScreen> {
                         category['name'],
                         () {},
                         true,
+                        0
                       ),
                       Expanded(
                         child: SizedBox(
@@ -101,6 +102,7 @@ class _DessertScreenState extends State<DessertScreen> {
                                   desserts[index]['name'],
                                   () {},
                                   false,
+                                  0
                                 );
                               },
                             ),
@@ -182,7 +184,7 @@ class _DessertScreenState extends State<DessertScreen> {
                                                 });
                                               },
                                                   desserts.contains(
-                                                      dessertsData[index]));
+                                                      dessertsData[index]),false,(){},1);
                                             },
                                           ),
                                         ),

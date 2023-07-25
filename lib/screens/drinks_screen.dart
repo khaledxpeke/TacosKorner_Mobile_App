@@ -83,6 +83,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
                         category['name'],
                         () {},
                         true,
+                        0
                       ),
                       Expanded(
                         child: SizedBox(
@@ -101,6 +102,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
                                   drinks[index]['name'],
                                   () {},
                                   false,
+                                  0
                                 );
                               },
                             ),
@@ -180,7 +182,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
                                                 });
                                               },
                                                   drinks.contains(
-                                                      drinksData[index]));
+                                                      drinksData[index]),false,(){},1);
                                             },
                                           ),
                                         ),

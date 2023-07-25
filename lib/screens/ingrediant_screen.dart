@@ -50,6 +50,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
 
     String type = Provider.of<Ingredients>(context).type;
     String message = Provider.of<Ingredients>(context).message;
+    int max = Provider.of<Ingredients>(context).max;
     List<dynamic> ingrediants = Provider.of<Ingredients>(context).ingrediants;
     List<dynamic> types = Provider.of<Ingredients>(context).types;
     int index = Provider.of<Ingredients>(context).index;
@@ -74,6 +75,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                         category['name'],
                         () {},
                         true,
+                        0
                       ),
                       Expanded(
                         child: SizedBox(
@@ -92,6 +94,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                   selectedIngrediants[index]['name'],
                                   () {},
                                   false,
+                                  0
                                 );
                               },
                             ),
@@ -142,58 +145,60 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             ingredient['type']['name'] == type)
                                         .toList();
                                     return CategoryItem(
-                                        ingrediantsData[index]['image'],
-                                        ingrediantsData[index]['name'],
-                                        null,
-                                        null, () {
-                                      setState(() {
-                                        if (selectedIngrediants
-                                            .contains(ingrediantsData[index])) {
-                                          if (type.toUpperCase() == 'SAUCE') {
-                                            nbsauce -= 1;
-                                          }
-                                          if (type.toUpperCase() == 'MEAT') {
-                                            selectedMeat -= 1;
-                                          }
-                                          selectedIngrediants
-                                              .remove(ingrediantsData[index]);
-                                        } else {
-                                          if (type.toUpperCase() == 'SAUCE') {
-                                            if (nbsauce < 2) {
-                                              selectedIngrediants
-                                                  .add(ingrediantsData[index]);
-                                              nbsauce += 1;
-                                            } else {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: ((context) {
-                                                    return ErrorPopUp("Alert",
-                                                        "Il faut choisir que 2 sauces au maximum");
-                                                  }));
+                                      ingrediantsData[index]['image'],
+                                      ingrediantsData[index]['name'],
+                                      null,
+                                      null,
+                                      () {
+                                        setState(() {
+                                          if (selectedIngrediants.contains(
+                                              ingrediantsData[index])) {
+                                            if (type.toUpperCase() == 'SAUCE') {
+                                              nbsauce -= 1;
                                             }
-                                          } else if (type.toUpperCase() ==
-                                              'MEAT') {
-                                            if (selectedMeat < nbMeat) {
-                                              selectedIngrediants
-                                                  .add(ingrediantsData[index]);
-                                              selectedMeat += 1;
-                                            } else {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: ((context) {
-                                                    return ErrorPopUp("Alert",
-                                                        "Il faut choisir que $nbMeat type de viande au maximum");
-                                                  }));
+                                            if (type.toUpperCase() == 'MEAT') {
+                                              selectedMeat -= 1;
                                             }
-                                          } else {
                                             selectedIngrediants
-                                                .add(ingrediantsData[index]);
+                                                .remove(ingrediantsData[index]);
+                                          } else {
+                                            if (type.toUpperCase() == 'SAUCE') {
+                                              if (nbsauce < 2) {
+                                                selectedIngrediants.add(
+                                                    ingrediantsData[index]);
+                                                nbsauce += 1;
+                                              } else {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: ((context) {
+                                                      return ErrorPopUp("Alert",
+                                                          "Il faut choisir que 2 sauces au maximum");
+                                                    }));
+                                              }
+                                            } else if (type.toUpperCase() ==
+                                                'MEAT') {
+                                              if (selectedMeat < nbMeat) {
+                                                selectedIngrediants.add(
+                                                    ingrediantsData[index]);
+                                                selectedMeat += 1;
+                                              } else {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: ((context) {
+                                                      return ErrorPopUp("Alert",
+                                                          "Il faut choisir que $nbMeat type de viande au maximum");
+                                                    }));
+                                              }
+                                            } else {
+                                              selectedIngrediants
+                                                  .add(ingrediantsData[index]);
+                                            }
                                           }
-                                        }
-                                      });
-                                    },
-                                        selectedIngrediants
-                                            .contains(ingrediantsData[index]));
+                                        });
+                                      },
+                                      selectedIngrediants
+                                          .contains(ingrediantsData[index]),false,(){},1
+                                    );
                                   },
                                 ),
                               ),
@@ -213,8 +218,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         if (types.length - 1 > index) {
-          Provider.of<Ingredients>(context, listen: false)
-              .setType(types[index + 1]['name'],types[index+1]['message'], index + 1);
+          Provider.of<Ingredients>(context, listen: false).setType(
+              types[index + 1]['name'],
+              types[index + 1]['message'],
+              types[index + 1]['max'],
+              index + 1);
         } else {
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(selectedIngrediants);
@@ -244,8 +252,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
             selectedIngrediants.removeWhere(
                 (ingrediant) => ingrediant['type']['name'] == type);
           });
-          Provider.of<Ingredients>(context, listen: false)
-              .setType(types[index - 1]['name'],types[index-1]['message'], index - 1);
+          Provider.of<Ingredients>(context, listen: false).setType(
+              types[index - 1]['name'],
+              types[index - 1]['message'],
+              types[index - 1]['max'],
+              index - 1);
         } else {
           Navigator.of(context).pop();
         }

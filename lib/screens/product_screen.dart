@@ -85,6 +85,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                 });
                               },
                               index == selectedCategory,
+                              0
                             );
                           },
                         ),
@@ -184,6 +185,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                   .setNbSteps(nbSteps);
                                             },
                                             index == selectedProduct,
+                                            false,(){},1
                                           );
                                         },
                                       ),
@@ -233,8 +235,8 @@ class _ProductScreenState extends State<ProductScreen> {
                 MaterialPageRoute(builder: (context) => ConfirmationScreen()));
           } else if (type.isNotEmpty) {
             Provider.of<Ingredients>(context, listen: false).setTypes(type);
-            Provider.of<Ingredients>(context, listen: false)
-                .setType(type[0]['name'], type[0]['message'], 0);
+            Provider.of<Ingredients>(context, listen: false).setType(
+                type[0]['name'], type[0]['message'], type[0]['max'], 0);
             Provider.of<Ingredients>(context, listen: false).setIngrediants(
                 categories[selectedCategory]['products'][selectedProduct]
                     ['ingrediants']);
