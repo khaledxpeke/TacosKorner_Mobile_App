@@ -108,21 +108,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                     return ConfirmationItem(
                                       product,
                                       products.length > 1 ? index + 1 : 0,
-                                      product['addons']
-                                          .map((addons) => {
-                                                "name": addons['name'],
-                                                "price":
-                                                    addons['price'] == null ||
-                                                            addons['price'] == 0
-                                                        ? "Free"
-                                                        : addons['price'],
-                                                "currency":
-                                                    addons['price'] == null ||
-                                                            addons['price'] == 0
-                                                        ? ""
-                                                        : addons['currency'],
-                                              })
-                                          .toList(),
+                                      product['addons'],
                                       () {
                                         showDialog(
                                           context: context,

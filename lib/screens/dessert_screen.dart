@@ -64,6 +64,8 @@ class _DessertScreenState extends State<DessertScreen> {
     desserts = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
+    Set<dynamic> displayedItems = {};
+    
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -79,12 +81,7 @@ class _DessertScreenState extends State<DessertScreen> {
                   Column(
                     children: [
                       SideItem(
-                        category['image'],
-                        category['name'],
-                        () {},
-                        true,
-                        0
-                      ),
+                          category['image'], category['name'], () {}, true, 0),
                       Expanded(
                         child: SizedBox(
                           width: 82.w,
@@ -97,13 +94,24 @@ class _DessertScreenState extends State<DessertScreen> {
                               shrinkWrap: true,
                               itemCount: desserts.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return SideItem(
-                                  desserts[index]['image'],
-                                  desserts[index]['name'],
-                                  () {},
-                                  false,
-                                  0
-                                );
+                                final dynamic currentItem = desserts[index];
+                                final int count = desserts
+                                    .where(
+                                        (element) => element == desserts[index])
+                                    .length;
+                                print(displayedItems);
+                                if (displayedItems.contains(currentItem)) {
+                                  return Container();
+                                } else {
+                                  displayedItems.add(currentItem);
+                                  return SideItem(
+                                    currentItem['image'],
+                                    currentItem['name'],
+                                    () {},
+                                    false,
+                                    count,
+                                  );
+                                }
                               },
                             ),
                           ),
@@ -153,6 +161,11 @@ class _DessertScreenState extends State<DessertScreen> {
                                                   context
                                                       .watch<Deserts>()
                                                       .deserts;
+                                              final int count = selectedDessert
+                                                  .where((element) =>
+                                                      element ==
+                                                      dessertsData[index])
+                                                  .length;
                                               return CategoryItem(
                                                   dessertsData[index]['image'],
                                                   dessertsData[index]['name'],
@@ -161,30 +174,40 @@ class _DessertScreenState extends State<DessertScreen> {
                                                               ['price']
                                                           .toString()),
                                                   dessertsData[index]
-                                                      ['currency'], () {
-                                                setState(() {
-                                                  if (selectedDessert.contains(
-                                                      dessertsData[index])) {
-                                                    newTotal -=
-                                                        dessertsData[index]
-                                                            ['price'];
-                                                    selectedDessert.remove(
-                                                        dessertsData[index]);
-                                                    desserts.remove(
-                                                        dessertsData[index]);
-                                                  } else {
-                                                    newTotal +=
-                                                        dessertsData[index]
-                                                            ['price'];
-                                                    selectedDessert.add(
-                                                        dessertsData[index]);
-                                                    desserts.add(
-                                                        dessertsData[index]);
-                                                  }
-                                                });
-                                              },
+                                                      ['currency'],
+                                                  () {
+                                                    if (dessertsData[index]
+                                                            ['max'] >
+                                                        count) {
+                                                      setState(() {
+                                                        newTotal +=
+                                                            dessertsData[index]
+                                                                ['price'];
+                                                        selectedDessert.add(
+                                                            dessertsData[
+                                                                index]);
+                                                        desserts.add(
+                                                            dessertsData[
+                                                                index]);
+                                                      });
+                                                    }
+                                                  },
                                                   desserts.contains(
-                                                      dessertsData[index]),false,(){},1);
+                                                      dessertsData[index]),
+                                                  desserts.contains(
+                                                      dessertsData[index]),
+                                                  () {
+                                                    setState(() {
+                                                      newTotal -=
+                                                          dessertsData[index]
+                                                              ['price'];
+                                                      selectedDessert.remove(
+                                                          dessertsData[index]);
+                                                      desserts.remove(
+                                                          dessertsData[index]);
+                                                    });
+                                                  },
+                                                  count);
                                             },
                                           ),
                                         ),
