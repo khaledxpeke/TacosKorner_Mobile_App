@@ -29,8 +29,6 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
   List<dynamic> selectedIngrediants = [];
   late ScrollController _scrollController;
   double newTotal = 0;
-  List<dynamic> free = [];
-  
 
   @override
   void initState() {
@@ -55,6 +53,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     double total = Provider.of<Categories>(context).total;
     Set<dynamic> displayedItems = {};
+    List<dynamic> free = [];
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -162,8 +161,6 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             ingrediantsData[index]['type']
                                                 ['name'])
                                         .length;
-                                    // bool isFree = true;
-                                    // int order = 1;
                                     return CategoryItem(
                                         ingrediantsData[index]['image'],
                                         ingrediantsData[index]['name'],
@@ -222,11 +219,24 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                           setState(() {
                                             selectedIngrediants
                                                 .remove(ingrediantsData[index]);
-                                            if (count2 <= type['free']+1) {
+                                            if (count2 <= type['free'] + 1) {
                                               newTotal = 0;
                                             } else {
-                                              newTotal -= ingrediantsData[index]
-                                                  ['price'];
+                                              List list = selectedIngrediants
+                                                    .where((element) =>
+                                                        element['type']
+                                                            ['name'] ==
+                                                        ingrediantsData[index]
+                                                            ['type']['name'])
+                                                  .toList();
+                                              List sublist =
+                                                  list.sublist(type['free']);
+                                              double totalPrice = sublist
+                                                  .map((item) =>
+                                                      item['price'].toDouble())
+                                                  .reduce((value, price) =>
+                                                      value + price);
+                                              newTotal = totalPrice;
                                             }
                                           });
                                         },
