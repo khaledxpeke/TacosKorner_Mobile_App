@@ -75,18 +75,13 @@ class _ProductScreenState extends State<ProductScreen> {
                           shrinkWrap: true,
                           itemCount: categories.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return SideItem(
-                              categories[index]['image'],
-                              categories[index]['name'],
-                              () {
-                                setState(() {
-                                  selectedCategory = index;
-                                  selectedProduct = -1;
-                                });
-                              },
-                              index == selectedCategory,
-                              0
-                            );
+                            return SideItem(categories[index]['image'],
+                                categories[index]['name'], () {
+                              setState(() {
+                                selectedCategory = index;
+                                selectedProduct = -1;
+                              });
+                            }, index == selectedCategory, 0);
                           },
                         ),
                       ),
@@ -132,61 +127,59 @@ class _ProductScreenState extends State<ProductScreen> {
                                         itemBuilder:
                                             (BuildContext context, int index) {
                                           return CategoryItem(
-                                            categories[selectedCategory]
-                                                ['products'][index]['image'],
-                                            categories[selectedCategory]
-                                                ['products'][index]['name'],
-                                            double.parse(
-                                                categories[selectedCategory]
-                                                            ['products'][index]
-                                                        ['price']
-                                                    .toString()),
-                                            categories[selectedCategory]
-                                                ['products'][index]['currency'],
-                                            () {
-                                              setState(() {
-                                                if (selectedProduct == index) {
-                                                  selectedProduct = -1;
-                                                } else {
-                                                  selectedProduct = index;
-                                                }
-                                              });
-                                              int nb = 2;
-                                              if (categories[selectedCategory]
-                                                                  ['products']
-                                                              [selectedProduct]
-                                                          ['choice']
-                                                      .toUpperCase() ==
-                                                  "SEUL") {
-                                                nb = 2;
+                                              categories[selectedCategory]
+                                                  ['products'][index]['image'],
+                                              categories[selectedCategory]
+                                                  ['products'][index]['name'],
+                                              double.parse(
+                                                  categories[selectedCategory]
+                                                              ['products']
+                                                          [index]['price']
+                                                      .toString()),
+                                              categories[selectedCategory]
+                                                      ['products'][index]
+                                                  ['currency'], () {
+                                            setState(() {
+                                              if (selectedProduct == index) {
+                                                selectedProduct = -1;
                                               } else {
-                                                nb = 5;
+                                                selectedProduct = index;
                                               }
-                                              int nbSteps = (nb +
-                                                      (categories[selectedCategory]
-                                                                          ['products']
-                                                                      [index][
-                                                                  'supplements']
-                                                              .isEmpty
-                                                          ? 0
-                                                          : 1) +
-                                                      (categories[selectedCategory]
-                                                                      ['products'][
-                                                                  index]['type']
-                                                              .isEmpty
-                                                          ? 0
-                                                          : categories[selectedCategory]
-                                                                      ['products']
-                                                                  [index]['type']
-                                                              .length))
-                                                  .toInt();
-                                              Provider.of<Categories>(context,
-                                                      listen: false)
-                                                  .setNbSteps(nbSteps);
-                                            },
-                                            index == selectedProduct,
-                                            false,(){},1
-                                          );
+                                            });
+                                            int nb = 2;
+                                            if (categories[selectedCategory]
+                                                                ['products']
+                                                            [selectedProduct]
+                                                        ['choice']
+                                                    .toUpperCase() ==
+                                                "SEUL") {
+                                              nb = 2;
+                                            } else {
+                                              nb = 5;
+                                            }
+                                            int nbSteps = (nb +
+                                                    (categories[selectedCategory]
+                                                                        ['products']
+                                                                    [index]
+                                                                ['supplements']
+                                                            .isEmpty
+                                                        ? 0
+                                                        : 1) +
+                                                    (categories[selectedCategory]
+                                                                    ['products']
+                                                                [index]['type']
+                                                            .isEmpty
+                                                        ? 0
+                                                        : categories[selectedCategory]
+                                                                    ['products']
+                                                                [index]['type']
+                                                            .length))
+                                                .toInt();
+                                            Provider.of<Categories>(context,
+                                                    listen: false)
+                                                .setNbSteps(nbSteps);
+                                          }, index == selectedProduct, false,
+                                              () {}, 1);
                                         },
                                       ),
                               ),
@@ -235,8 +228,8 @@ class _ProductScreenState extends State<ProductScreen> {
                 MaterialPageRoute(builder: (context) => ConfirmationScreen()));
           } else if (type.isNotEmpty) {
             Provider.of<Ingredients>(context, listen: false).setTypes(type);
-            Provider.of<Ingredients>(context, listen: false).setType(
-                type[0]['name'], type[0]['message'], type[0]['max'], 0);
+            Provider.of<Ingredients>(context, listen: false)
+                .setType(type[0], 0);
             Provider.of<Ingredients>(context, listen: false).setIngrediants(
                 categories[selectedCategory]['products'][selectedProduct]
                     ['ingrediants']);

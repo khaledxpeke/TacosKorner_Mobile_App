@@ -5,12 +5,9 @@ import 'package:flutter/cupertino.dart';
 class Ingredients with ChangeNotifier {
   List<dynamic> selectedIngrediants = [];
   List<dynamic> types = [];
-  String type = "";
-  String message = "";
-  int max = 1;
+  Map<String, dynamic> type = {};
   List<dynamic> ingrediants = [];
   int index = 0;
-
 
   setSelectedIngrediants(List<dynamic> selectedIngrediants1) {
     selectedIngrediants = selectedIngrediants1;
@@ -22,10 +19,8 @@ class Ingredients with ChangeNotifier {
     notifyListeners();
   }
 
-  setType(String type1,String message1,int max1,int indx) {
+  setType(Map<String, dynamic> type1, int indx) {
     type = type1;
-    message = message1;
-    max = max1;
     index = indx;
     notifyListeners();
   }

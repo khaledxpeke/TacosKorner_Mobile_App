@@ -27,9 +27,10 @@ class IngrediantScreen extends StatefulWidget {
 
 class _IngrediantScreenState extends State<IngrediantScreen> {
   List<dynamic> selectedIngrediants = [];
-  int nbsauce = 0;
-  int selectedMeat = 0;
   late ScrollController _scrollController;
+  double newTotal = 0;
+  List<dynamic> free = [];
+  
 
   @override
   void initState() {
@@ -46,16 +47,14 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    int nbMeat = category['maxIngrediant'] ?? 0;
 
-    String type = Provider.of<Ingredients>(context).type;
-    String message = Provider.of<Ingredients>(context).message;
-    int max = Provider.of<Ingredients>(context).max;
+    Map<String, dynamic> type = Provider.of<Ingredients>(context).type;
     List<dynamic> ingrediants = Provider.of<Ingredients>(context).ingrediants;
     List<dynamic> types = Provider.of<Ingredients>(context).types;
     int index = Provider.of<Ingredients>(context).index;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     double total = Provider.of<Categories>(context).total;
+    Set<dynamic> displayedItems = {};
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -71,12 +70,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                   Column(
                     children: [
                       SideItem(
-                        category['image'],
-                        category['name'],
-                        () {},
-                        true,
-                        0
-                      ),
+                          category['image'], category['name'], () {}, true, 0),
                       Expanded(
                         child: SizedBox(
                           width: 82.w,
@@ -89,19 +83,31 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                               shrinkWrap: true,
                               itemCount: selectedIngrediants.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return SideItem(
-                                  selectedIngrediants[index]['image'],
-                                  selectedIngrediants[index]['name'],
-                                  () {},
-                                  false,
-                                  0
-                                );
+                                final dynamic currentItem =
+                                    selectedIngrediants[index];
+                                final int count = selectedIngrediants
+                                    .where((element) =>
+                                        element == selectedIngrediants[index])
+                                    .length;
+                                if (displayedItems.contains(currentItem)) {
+                                  return Container();
+                                } else {
+                                  displayedItems.add(currentItem);
+                                  return SideItem(
+                                    currentItem['image'],
+                                    currentItem['name'],
+                                    () {},
+                                    false,
+                                    count,
+                                  );
+                                }
                               },
                             ),
                           ),
                         ),
                       ),
-                      TotalAndItems(total, selectedIngrediants.length),
+                      TotalAndItems(
+                          total + newTotal, selectedIngrediants.length),
                       SizedBox(
                         height: 85.h,
                       )
@@ -117,7 +123,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                               builder: (context, categories, _) => TopSide(
                                   category['name'],
                                   categories.stepIndex,
-                                  message)),
+                                  type['message'])),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -130,7 +136,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                       .watch<Ingredients>()
                                       .ingrediants
                                       .where((ingrediant) =>
-                                          ingrediant['type']['name'] == type)
+                                          ingrediant['type']['name'] ==
+                                          type['name'])
                                       .length,
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
@@ -142,63 +149,88 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                       (BuildContext context, int index) {
                                     List<dynamic> ingrediantsData = ingrediants
                                         .where((ingredient) =>
-                                            ingredient['type']['name'] == type)
+                                            ingredient['type']['name'] ==
+                                            type['name'])
                                         .toList();
+                                    final int count = selectedIngrediants
+                                        .where((element) =>
+                                            element == ingrediantsData[index])
+                                        .length;
+                                    final int count2 = selectedIngrediants
+                                        .where((element) =>
+                                            element['type']['name'] ==
+                                            ingrediantsData[index]['type']
+                                                ['name'])
+                                        .length;
+                                    // bool isFree = true;
+                                    // int order = 1;
                                     return CategoryItem(
-                                      ingrediantsData[index]['image'],
-                                      ingrediantsData[index]['name'],
-                                      null,
-                                      null,
-                                      () {
-                                        setState(() {
-                                          if (selectedIngrediants.contains(
-                                              ingrediantsData[index])) {
-                                            if (type.toUpperCase() == 'SAUCE') {
-                                              nbsauce -= 1;
+                                        ingrediantsData[index]['image'],
+                                        ingrediantsData[index]['name'],
+                                        type['quantity'] > 1 &&
+                                                count2 >= type['free']
+                                            ? double.parse(
+                                                ingrediantsData[index]['price']
+                                                    .toString())
+                                            : null,
+                                        type['quantity'] > 1 &&
+                                                count2 >= type['free']
+                                            ? ingrediantsData[index]['currency']
+                                            : null,
+                                        () {
+                                          if (type['quantity'] > 1) {
+                                            if (count2 < type['quantity']) {
+                                              setState(() {
+                                                selectedIngrediants.add(
+                                                    ingrediantsData[index]);
+                                                if (count2 >= type['free']) {
+                                                  newTotal +=
+                                                      ingrediantsData[index]
+                                                          ['price'];
+                                                }
+                                              });
                                             }
-                                            if (type.toUpperCase() == 'MEAT') {
-                                              selectedMeat -= 1;
-                                            }
-                                            selectedIngrediants
-                                                .remove(ingrediantsData[index]);
+                                          } else if (selectedIngrediants
+                                              .contains(
+                                                  ingrediantsData[index])) {
+                                            setState(() {
+                                              selectedIngrediants.remove(
+                                                  ingrediantsData[index]);
+                                            });
                                           } else {
-                                            if (type.toUpperCase() == 'SAUCE') {
-                                              if (nbsauce < 2) {
-                                                selectedIngrediants.add(
-                                                    ingrediantsData[index]);
-                                                nbsauce += 1;
-                                              } else {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: ((context) {
-                                                      return ErrorPopUp("Alert",
-                                                          "Il faut choisir que 2 sauces au maximum");
-                                                    }));
-                                              }
-                                            } else if (type.toUpperCase() ==
-                                                'MEAT') {
-                                              if (selectedMeat < nbMeat) {
-                                                selectedIngrediants.add(
-                                                    ingrediantsData[index]);
-                                                selectedMeat += 1;
-                                              } else {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: ((context) {
-                                                      return ErrorPopUp("Alert",
-                                                          "Il faut choisir que $nbMeat type de viande au maximum");
-                                                    }));
-                                              }
+                                            if (count2 >= type['free']) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: ((context) {
+                                                    return ErrorPopUp("Alert",
+                                                        "Il faut choisir que ${type['free']} ${type['name']} au maximum");
+                                                  }));
                                             } else {
-                                              selectedIngrediants
-                                                  .add(ingrediantsData[index]);
+                                              setState(() {
+                                                selectedIngrediants.add(
+                                                    ingrediantsData[index]);
+                                              });
                                             }
                                           }
-                                        });
-                                      },
-                                      selectedIngrediants
-                                          .contains(ingrediantsData[index]),false,(){},1
-                                    );
+                                        },
+                                        selectedIngrediants
+                                            .contains(ingrediantsData[index]),
+                                        type['quantity'] > 1 &&
+                                            selectedIngrediants.contains(
+                                                ingrediantsData[index]),
+                                        () {
+                                          setState(() {
+                                            selectedIngrediants
+                                                .remove(ingrediantsData[index]);
+                                            if (count2 <= type['free']+1) {
+                                              newTotal = 0;
+                                            } else {
+                                              newTotal -= ingrediantsData[index]
+                                                  ['price'];
+                                            }
+                                          });
+                                        },
+                                        count);
                                   },
                                 ),
                               ),
@@ -218,11 +250,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         if (types.length - 1 > index) {
-          Provider.of<Ingredients>(context, listen: false).setType(
-              types[index + 1]['name'],
-              types[index + 1]['message'],
-              types[index + 1]['max'],
-              index + 1);
+          Provider.of<Ingredients>(context, listen: false)
+              .setType(types[index + 1], index + 1);
         } else {
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(selectedIngrediants);
@@ -237,26 +266,13 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
       }, () {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
-        if (type.toUpperCase() == 'SAUCE') {
-          setState(() {
-            nbsauce = 0;
-          });
-        }
-        if (type.toUpperCase() == 'MEAT') {
-          setState(() {
-            selectedMeat = 0;
-          });
-        }
         if (index > 0) {
           setState(() {
             selectedIngrediants.removeWhere(
-                (ingrediant) => ingrediant['type']['name'] == type);
+                (ingrediant) => ingrediant['type']['name'] == type['name']);
           });
-          Provider.of<Ingredients>(context, listen: false).setType(
-              types[index - 1]['name'],
-              types[index - 1]['message'],
-              types[index - 1]['max'],
-              index - 1);
+          Provider.of<Ingredients>(context, listen: false)
+              .setType(types[index - 1], index - 1);
         } else {
           Navigator.of(context).pop();
         }

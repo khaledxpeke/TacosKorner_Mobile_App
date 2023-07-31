@@ -99,7 +99,6 @@ class _DessertScreenState extends State<DessertScreen> {
                                     .where(
                                         (element) => element == desserts[index])
                                     .length;
-                                print(displayedItems);
                                 if (displayedItems.contains(currentItem)) {
                                   return Container();
                                 } else {
