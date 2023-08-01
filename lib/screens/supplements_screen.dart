@@ -68,6 +68,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                         category['name'],
                         () {},
                         true,
+                        0
                       ),
                       Expanded(
                         child: SizedBox(
@@ -86,6 +87,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                   supplements[index]['name'],
                                   () {},
                                   false,
+                                  0
                                 );
                               },
                             ),
@@ -154,7 +156,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                       });
                                     },
                                         selectedSupplements
-                                            .contains(supplementsData[index]));
+                                            .contains(supplementsData[index]),false,(){},1);
                                   },
                                 ),
                               ),

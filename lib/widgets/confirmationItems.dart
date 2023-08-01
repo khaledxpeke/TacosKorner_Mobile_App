@@ -21,11 +21,12 @@ class ConfirmationItem extends StatelessWidget {
     this.deletePlat,
     this.removeAddon,
   );
-
+  Set<dynamic> displayedItems = {};
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> lastProduct =
         Provider.of<Categories>(context).lastProduct;
+
     return Padding(
       padding: EdgeInsets.only(bottom: 5.h),
       child: Column(
@@ -80,45 +81,55 @@ class ConfirmationItem extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(top: 5.h),
             child: Column(
-              children: items.map((item) {
-                return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        item['name'],
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10.sp,
-                            color: textColor),
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            "${item['price']}${item['currency']}",
-                            style: TextStyle(
+              children: items.asMap().entries.map((entry) {
+                final int index = entry.key;
+                final Map<String, dynamic> item = entry.value;
+                final dynamic currentItem = items[index];
+                final int count =
+                    items.where((element) => element == items[index]).length;
+                if (displayedItems.contains(currentItem)) {
+                  return Container();
+                } else {
+                  displayedItems.add(currentItem);
+                  return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "X$count ${item['name']}",
+                          style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 10.sp,
-                              color: textColor,
+                              color: textColor),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              "${item['price'] == null || item['price'] == 0 ? "Free" : item['price']}${item['price'] == null || item['price'] == 0 ? "" : item['currency']}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 10.sp,
+                                color: textColor,
+                              ),
                             ),
-                          ),
-                          lastProduct == plat
-                              ? Container()
-                              : GestureDetector(
-                                  onTap: () => removeAddon(item),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 4.w),
-                                    child: Text(
-                                      '-',
-                                      style: TextStyle(
-                                          color: redColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 26),
+                            lastProduct == plat
+                                ? Container()
+                                : GestureDetector(
+                                    onTap: () => removeAddon(item),
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 4.w),
+                                      child: Text(
+                                        '-',
+                                        style: TextStyle(
+                                            color: redColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 26),
+                                      ),
                                     ),
-                                  ),
-                                )
-                        ],
-                      ),
-                    ]);
+                                  )
+                          ],
+                        ),
+                      ]);
+                }
               }).toList(),
             ),
           )

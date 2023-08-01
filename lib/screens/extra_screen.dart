@@ -63,6 +63,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
     extras = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
+    Set<dynamic> displayedItems = {};
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -78,11 +79,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
                   Column(
                     children: [
                       SideItem(
-                        category['image'],
-                        category['name'],
-                        () {},
-                        true,
-                      ),
+                          category['image'], category['name'], () {}, true, 0),
                       Expanded(
                         child: SizedBox(
                           width: 82.w,
@@ -95,12 +92,23 @@ class _ExtraScreenState extends State<ExtraScreen> {
                               shrinkWrap: true,
                               itemCount: extras.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return SideItem(
-                                  extras[index]['image'],
-                                  extras[index]['name'],
-                                  () {},
-                                  false,
-                                );
+                                final dynamic currentItem = extras[index];
+                                final int count = selectedExtra
+                                    .where(
+                                        (element) => element == extras[index])
+                                    .length;
+                                if (displayedItems.contains(currentItem)) {
+                                  return Container();
+                                } else {
+                                  displayedItems.add(currentItem);
+                                  return SideItem(
+                                    currentItem['image'],
+                                    currentItem['name'],
+                                    () {},
+                                    false,
+                                    count,
+                                  );
+                                }
                               },
                             ),
                           ),
@@ -146,9 +154,13 @@ class _ExtraScreenState extends State<ExtraScreen> {
                                             ),
                                             itemBuilder: (BuildContext context,
                                                 int index) {
-                                              List<dynamic> extrasData = context
-                                                  .watch<Extra>()
-                                                  .extras;
+                                              List<dynamic> extrasData =
+                                                  context.watch<Extra>().extras;
+                                              final int count = selectedExtra
+                                                  .where((element) =>
+                                                      element ==
+                                                      extrasData[index])
+                                                  .length;
                                               return CategoryItem(
                                                   extrasData[index]['image'],
                                                   extrasData[index]['name'],
@@ -157,29 +169,36 @@ class _ExtraScreenState extends State<ExtraScreen> {
                                                       .toString()),
                                                   extrasData[index]['currency'],
                                                   () {
-                                                setState(() {
-                                                  if (selectedExtra.contains(
-                                                      extrasData[index])) {
-                                                    newTotal -=
-                                                        extrasData[index]
-                                                            ['price'];
-                                                    selectedExtra.remove(
-                                                        extrasData[index]);
-                                                    extras.remove(
-                                                        extrasData[index]);
-                                                  } else {
-                                                    newTotal +=
-                                                        extrasData[index]
-                                                            ['price'];
-                                                    selectedExtra
-                                                        .add(extrasData[index]);
-                                                    extras
-                                                        .add(extrasData[index]);
-                                                  }
-                                                });
-                                              },
+                                                    if (extrasData[index]
+                                                            ['max'] >
+                                                        count) {
+                                                      setState(() {
+                                                        newTotal +=
+                                                            extrasData[index]
+                                                                ['price'];
+                                                        selectedExtra.add(
+                                                            extrasData[index]);
+                                                        extras.add(
+                                                            extrasData[index]);
+                                                      });
+                                                    }
+                                                  },
                                                   extras.contains(
-                                                      extrasData[index]));
+                                                      extrasData[index]),
+                                                  extras.contains(
+                                                      extrasData[index]),
+                                                  () {
+                                                    setState(() {
+                                                      newTotal -=
+                                                          extrasData[index]
+                                                              ['price'];
+                                                      selectedExtra.remove(
+                                                          extrasData[index]);
+                                                      extras.remove(
+                                                          extrasData[index]);
+                                                    });
+                                                  },
+                                                  count);
                                             },
                                           ),
                                         ),

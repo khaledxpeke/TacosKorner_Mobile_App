@@ -64,6 +64,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
     drinks = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
+    Set<dynamic> displayedItems = {};
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -79,11 +80,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
                   Column(
                     children: [
                       SideItem(
-                        category['image'],
-                        category['name'],
-                        () {},
-                        true,
-                      ),
+                          category['image'], category['name'], () {}, true, 0),
                       Expanded(
                         child: SizedBox(
                           width: 82.w,
@@ -96,12 +93,23 @@ class _DrinkScreenState extends State<DrinkScreen> {
                               shrinkWrap: true,
                               itemCount: drinks.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return SideItem(
-                                  drinks[index]['image'],
-                                  drinks[index]['name'],
-                                  () {},
-                                  false,
-                                );
+                                final dynamic currentItem = drinks[index];
+                                final int count = drinks
+                                    .where(
+                                        (element) => element == drinks[index])
+                                    .length;
+                                if (displayedItems.contains(currentItem)) {
+                                  return Container();
+                                } else {
+                                  displayedItems.add(currentItem);
+                                  return SideItem(
+                                    currentItem['image'],
+                                    currentItem['name'],
+                                    () {},
+                                    false,
+                                    count,
+                                  );
+                                }
                               },
                             ),
                           ),
@@ -150,6 +158,11 @@ class _DrinkScreenState extends State<DrinkScreen> {
                                               List<dynamic> drinksData = context
                                                   .watch<Drinks>()
                                                   .drinks;
+                                              final int count = selectedDrink
+                                                  .where((element) =>
+                                                      element ==
+                                                      drinksData[index])
+                                                  .length;
                                               return CategoryItem(
                                                   drinksData[index]['image'],
                                                   drinksData[index]['name'],
@@ -158,29 +171,36 @@ class _DrinkScreenState extends State<DrinkScreen> {
                                                       .toString()),
                                                   drinksData[index]['currency'],
                                                   () {
-                                                setState(() {
-                                                  if (selectedDrink.contains(
-                                                      drinksData[index])) {
-                                                    newTotal -=
-                                                        drinksData[index]
-                                                            ['price'];
-                                                    selectedDrink.remove(
-                                                        drinksData[index]);
-                                                    drinks.remove(
-                                                        drinksData[index]);
-                                                  } else {
-                                                    newTotal +=
-                                                        drinksData[index]
-                                                            ['price'];
-                                                    selectedDrink
-                                                        .add(drinksData[index]);
-                                                    drinks
-                                                        .add(drinksData[index]);
-                                                  }
-                                                });
-                                              },
+                                                    if (drinksData[index]
+                                                            ['max'] >
+                                                        count) {
+                                                      setState(() {
+                                                        newTotal +=
+                                                            drinksData[index]
+                                                                ['price'];
+                                                        selectedDrink.add(
+                                                            drinksData[index]);
+                                                        drinks.add(
+                                                            drinksData[index]);
+                                                      });
+                                                    }
+                                                  },
                                                   drinks.contains(
-                                                      drinksData[index]));
+                                                      drinksData[index]),
+                                                  drinks.contains(
+                                                      drinksData[index]),
+                                                  () {
+                                                    setState(() {
+                                                      newTotal -=
+                                                          drinksData[index]
+                                                              ['price'];
+                                                      selectedDrink.remove(
+                                                          drinksData[index]);
+                                                      drinks.remove(
+                                                          drinksData[index]);
+                                                    });
+                                                  },
+                                                  count);
                                             },
                                           ),
                                         ),
