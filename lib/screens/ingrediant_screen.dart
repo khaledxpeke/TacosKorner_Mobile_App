@@ -151,11 +151,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             ingredient['type']['name'] ==
                                             type['name'])
                                         .toList();
-                                     int count = selectedIngrediants
+                                    int count = selectedIngrediants
                                         .where((element) =>
                                             element == ingrediantsData[index])
                                         .length;
-                                     int count2 = selectedIngrediants
+                                    int count2 = selectedIngrediants
                                         .where((element) =>
                                             element['type']['name'] ==
                                             ingrediantsData[index]['type']
@@ -167,12 +167,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                         type['quantity'] > 1 &&
                                                 count2 >= type['free']
                                             ? double.parse(
-                                                ingrediantsData[index]['price']
-                                                    .toString())
+                                                type['price'].toString())
                                             : null,
                                         type['quantity'] > 1 &&
                                                 count2 >= type['free']
-                                            ? ingrediantsData[index]['currency']
+                                            ? type['currency']
                                             : null,
                                         () {
                                           if (type['quantity'] > 1) {
@@ -181,12 +180,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                 selectedIngrediants.add(
                                                     ingrediantsData[index]);
                                                 if (count2 >= type['free']) {
-                                                  newTotal +=
-                                                      ingrediantsData[index]
-                                                          ['price'];
+                                                  newTotal += type['price'];
                                                   tot[ingredIndex] +=
-                                                      ingrediantsData[index]
-                                                          ['price'];
+                                                      type['price'];
                                                 }
                                               });
                                             }
@@ -233,11 +229,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               List sublist =
                                                   list.sublist(startIndex);
                                               if (sublist.isNotEmpty) {
-                                                tot[ingredIndex] = sublist
-                                                    .map((item) => item['price']
-                                                        .toDouble())
-                                                    .reduce((value, price) =>
-                                                        value + price);
+                                                tot[ingredIndex] = (sublist.length * type['price']).toDouble();
                                               } else {
                                                 tot[ingredIndex] = 0;
                                               }
@@ -277,9 +269,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(selectedIngrediants);
           Provider.of<Categories>(context, listen: false)
-            .setTotal(total + newTotal);
+              .setTotal(total + newTotal);
           setState(() {
-            newTotal=0;
+            newTotal = 0;
           });
           if (category['supplements'].isNotEmpty) {
             Navigator.push(context,

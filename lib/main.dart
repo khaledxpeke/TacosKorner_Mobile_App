@@ -22,9 +22,9 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => Categories()),
+      ChangeNotifierProvider(create: (_) => Ingredients()),
       ChangeNotifierProvider(create: (_) => Deserts()),
       ChangeNotifierProvider(create: (_) => Drinks()),
-      ChangeNotifierProvider(create: (_) => Ingredients()),
       ChangeNotifierProvider(create: (_) => Supplements()),
       ChangeNotifierProvider(create: (_) => Extra()),
     ],
