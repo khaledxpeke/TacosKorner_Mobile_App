@@ -29,6 +29,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
   List<dynamic> selectedIngrediants = [];
   late ScrollController _scrollController;
   double newTotal = 0;
+  List<double> tot = [0.0];
 
   @override
   void initState() {
@@ -49,11 +50,10 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
     Map<String, dynamic> type = Provider.of<Ingredients>(context).type;
     List<dynamic> ingrediants = Provider.of<Ingredients>(context).ingrediants;
     List<dynamic> types = Provider.of<Ingredients>(context).types;
-    int index = Provider.of<Ingredients>(context).index;
+    int ingredIndex = Provider.of<Ingredients>(context).index;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     double total = Provider.of<Categories>(context).total;
     Set<dynamic> displayedItems = {};
-    List<dynamic> free = [];
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -151,11 +151,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             ingredient['type']['name'] ==
                                             type['name'])
                                         .toList();
-                                    final int count = selectedIngrediants
+                                     int count = selectedIngrediants
                                         .where((element) =>
                                             element == ingrediantsData[index])
                                         .length;
-                                    final int count2 = selectedIngrediants
+                                     int count2 = selectedIngrediants
                                         .where((element) =>
                                             element['type']['name'] ==
                                             ingrediantsData[index]['type']
@@ -182,6 +182,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                     ingrediantsData[index]);
                                                 if (count2 >= type['free']) {
                                                   newTotal +=
+                                                      ingrediantsData[index]
+                                                          ['price'];
+                                                  tot[ingredIndex] +=
                                                       ingrediantsData[index]
                                                           ['price'];
                                                 }
@@ -219,24 +222,29 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                           setState(() {
                                             selectedIngrediants
                                                 .remove(ingrediantsData[index]);
-                                            if (count2 <= type['free'] + 1) {
-                                              newTotal = 0;
-                                            } else {
+                                            if (count2 > type['free']) {
                                               List list = selectedIngrediants
-                                                    .where((element) =>
-                                                        element['type']
-                                                            ['name'] ==
-                                                        ingrediantsData[index]
-                                                            ['type']['name'])
+                                                  .where((element) =>
+                                                      element['type']['name'] ==
+                                                      ingrediantsData[index]
+                                                          ['type']['name'])
                                                   .toList();
+                                              int startIndex = type['free'];
                                               List sublist =
-                                                  list.sublist(type['free']);
-                                              double totalPrice = sublist
-                                                  .map((item) =>
-                                                      item['price'].toDouble())
-                                                  .reduce((value, price) =>
-                                                      value + price);
-                                              newTotal = totalPrice;
+                                                  list.sublist(startIndex);
+                                              if (sublist.isNotEmpty) {
+                                                tot[ingredIndex] = sublist
+                                                    .map((item) => item['price']
+                                                        .toDouble())
+                                                    .reduce((value, price) =>
+                                                        value + price);
+                                              } else {
+                                                tot[ingredIndex] = 0;
+                                              }
+                                              double sum = tot.reduce((value,
+                                                      element) =>
+                                                  value + element.toDouble());
+                                              newTotal = sum;
                                             }
                                           });
                                         },
@@ -259,12 +267,20 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
       bottomSheet: bottomsheet(context, () {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
-        if (types.length - 1 > index) {
+        if (types.length - 1 > ingredIndex) {
           Provider.of<Ingredients>(context, listen: false)
-              .setType(types[index + 1], index + 1);
+              .setType(types[ingredIndex + 1], ingredIndex + 1);
+          setState(() {
+            tot.add(0);
+          });
         } else {
           Provider.of<Ingredients>(context, listen: false)
               .setSelectedIngrediants(selectedIngrediants);
+          Provider.of<Categories>(context, listen: false)
+            .setTotal(total + newTotal);
+          setState(() {
+            newTotal=0;
+          });
           if (category['supplements'].isNotEmpty) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => SupplementsScreen()));
@@ -276,13 +292,15 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
       }, () {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
-        if (index > 0) {
+        if (ingredIndex > 0) {
           setState(() {
             selectedIngrediants.removeWhere(
                 (ingrediant) => ingrediant['type']['name'] == type['name']);
+            newTotal -= tot[ingredIndex];
+            tot.removeLast();
           });
           Provider.of<Ingredients>(context, listen: false)
-              .setType(types[index - 1], index - 1);
+              .setType(types[ingredIndex - 1], ingredIndex - 1);
         } else {
           Navigator.of(context).pop();
         }
