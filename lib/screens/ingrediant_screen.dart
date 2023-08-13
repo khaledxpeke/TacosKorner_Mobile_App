@@ -157,9 +157,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                         .length;
                                     int count2 = selectedIngrediants
                                         .where((element) =>
-                                            element['type']['name'] ==
+                                            element['type']?['name'] ==
                                             ingrediantsData[index]['type']
-                                                ['name'])
+                                                ?['name'])
                                         .length;
                                     return CategoryItem(
                                         ingrediantsData[index]['image'],
@@ -229,7 +229,10 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               List sublist =
                                                   list.sublist(startIndex);
                                               if (sublist.isNotEmpty) {
-                                                tot[ingredIndex] = (sublist.length * type['price']).toDouble();
+                                                tot[ingredIndex] =
+                                                    (sublist.length *
+                                                            type['price'])
+                                                        .toDouble();
                                               } else {
                                                 tot[ingredIndex] = 0;
                                               }
