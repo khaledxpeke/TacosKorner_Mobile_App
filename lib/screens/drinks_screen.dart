@@ -61,7 +61,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    drinks = Provider.of<Ingredients>(context).selectedIngrediants;
+    drinks = Provider.of<Ingredients>(context).selectedExtras;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     Set<dynamic> displayedItems = {};
@@ -220,7 +220,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(drinks);
+            .setSelectedExtras(drinks);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
         setState(() {
@@ -236,7 +236,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
           drinks.removeWhere((item) => selectedDrink.contains(item));
         });
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(drinks);
+            .setSelectedExtras(drinks);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();

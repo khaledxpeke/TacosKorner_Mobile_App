@@ -22,11 +22,11 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => Categories()),
-      ChangeNotifierProvider(create: (_) => Ingredients()),
       ChangeNotifierProvider(create: (_) => Deserts()),
       ChangeNotifierProvider(create: (_) => Drinks()),
       ChangeNotifierProvider(create: (_) => Supplements()),
       ChangeNotifierProvider(create: (_) => Extra()),
+      ChangeNotifierProvider(create: (_) => Ingredients()),
     ],
     child: MyApp(),
   ));
@@ -42,9 +42,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Tacos Korner',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              fontFamily: 'Inter'
-            ),
+            theme: ThemeData(fontFamily: 'Inter'),
             home: SplashScreen(),
             routes: {
               CategoryScreen.routeName: (ctx) => CategoryScreen(),

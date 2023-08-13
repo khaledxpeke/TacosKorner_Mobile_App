@@ -30,8 +30,10 @@ class _DessertScreenState extends State<DessertScreen> {
   late ScrollController _scrollController;
   List<dynamic> selectedDessert = [];
   List<dynamic> desserts = [];
+  List<dynamic> extras = [];
   double newTotal = 0;
   double lastTotal = 0;
+  int size = 0;
   bool _isLoading = true;
   String errorMessage = "";
 
@@ -61,11 +63,13 @@ class _DessertScreenState extends State<DessertScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    desserts = Provider.of<Ingredients>(context).selectedIngrediants;
+    desserts = Provider.of<Ingredients>(context).selectedExtras;
+    extras = Provider.of<Ingredients>(context).selectedIngrediants;
+    size = Provider.of<Ingredients>(context).size;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     Set<dynamic> displayedItems = {};
-    
+
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -226,11 +230,17 @@ class _DessertScreenState extends State<DessertScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(desserts);
+            .setSelectedExtras(desserts);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
-        Provider.of<Categories>(context, listen: false).setProducts(
-            {"plat": category, "addons": desserts, "total": total + newTotal});
+        List<dynamic> ingrediants = desserts.sublist(0,size);
+        List<dynamic> extras = desserts.sublist(size,desserts.length);
+        Provider.of<Categories>(context, listen: false).setProducts({
+          "plat": category,
+          "addons": ingrediants,
+          "extras":  extras,
+          "total": total + newTotal
+        });
         setState(() {
           lastTotal = newTotal;
           newTotal = 0;
@@ -244,7 +254,7 @@ class _DessertScreenState extends State<DessertScreen> {
           desserts.removeWhere((item) => selectedDessert.contains(item));
         });
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(desserts);
+            .setSelectedExtras(desserts);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();

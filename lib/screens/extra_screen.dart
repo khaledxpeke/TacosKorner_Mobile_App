@@ -1,11 +1,11 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/categoriesProvider.dart';
-import 'package:takos_korner/provider/ingrediantProvider.dart';
 import 'package:takos_korner/provider/extraProvider.dart';
+import 'package:takos_korner/provider/ingrediantProvider.dart';
 import 'package:takos_korner/screens/drinks_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
 import 'package:takos_korner/widgets/bottomsheet.dart';
@@ -38,11 +38,16 @@ class _ExtraScreenState extends State<ExtraScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+
     loadData();
   }
 
   void loadData() async {
     String result = await context.read<Extra>().getExtra();
+    int extrasLength =
+        Provider.of<Ingredients>(context, listen: false).selectedExtras.length;
+    Provider.of<Ingredients>(context, listen: false)
+        .setAddonsSize(extrasLength);
     setState(() {
       _isLoading = false;
       if (result != "success") {
@@ -54,13 +59,14 @@ class _ExtraScreenState extends State<ExtraScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    extras = Provider.of<Ingredients>(context).selectedIngrediants;
+    extras = Provider.of<Ingredients>(context).selectedExtras;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     Set<dynamic> displayedItems = {};
@@ -93,7 +99,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
                               itemCount: extras.length,
                               itemBuilder: (BuildContext context, int index) {
                                 final dynamic currentItem = extras[index];
-                                final int count = selectedExtra
+                                final int count = extras
                                     .where(
                                         (element) => element == extras[index])
                                     .length;
@@ -217,8 +223,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
       bottomSheet: bottomsheet(context, () {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
-        Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(extras);
+        Provider.of<Ingredients>(context, listen: false).setSelectedExtras(extras);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
         setState(() {
@@ -233,8 +238,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
         setState(() {
           extras.removeWhere((item) => selectedExtra.contains(item));
         });
-        Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(extras);
+        Provider.of<Ingredients>(context, listen: false).setSelectedExtras(extras);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
