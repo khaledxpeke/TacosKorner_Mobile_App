@@ -307,7 +307,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
         } else {
           List<dynamic> productsHistory = products
               .map((product) =>
-                  {'plat': product['plat']['_id'], 'addons': product['addons']})
+                  {'plat': product['plat']['_id'], 'addons': product['addons'], 'extras': product['extras']})
               .toList();
           setState(() {
             isLoading = true;
