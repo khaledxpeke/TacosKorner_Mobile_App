@@ -224,46 +224,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             selectedIngrediants
                                                 .remove(ingrediantsData[index]);
                                             if (count2 > type['free']) {
-                                              String typeName =
-                                                  ingrediantsData[index]['type']
-                                                      ['name'];
-                                              List list = selectedIngrediants
-                                                  .where((element) =>
-                                                      element['type']['name'] ==
-                                                      typeName)
-                                                  .toList();
-                                              int startIndex = type['free'];
-                                              List sublist =
-                                                  list.sublist(0, startIndex);
-                                              List sublist2 =
-                                                  list.sublist(startIndex);
-                                              if (sublist.isNotEmpty) {
-                                                for (var element in sublist) {
-                                                  element['price'] = 0.0;
-                                                }
-                                              }
-                                              if (sublist2.isNotEmpty) {
-                                                tot[ingredIndex] =
-                                                    (sublist2.length *
-                                                            type['price'])
-                                                        .toDouble();
-                                                for (var element in sublist2) {
-                                                  element['price'] = 1.0;
-                                                }
-                                              } else {
-                                                tot[ingredIndex] = 0;
-                                              }
-                                              selectedIngrediants.removeWhere(
-                                                  (element) =>
-                                                      element['type']['name'] ==
-                                                      typeName);
-                                              selectedIngrediants
-                                                ..addAll(sublist)
-                                                ..addAll(sublist2);
-                                              double sum = tot.reduce((value,
-                                                      element) =>
-                                                  value + element.toDouble());
-                                              newTotal = sum;
+                                              tot[ingredIndex] -= type['price'].toDouble();
+                                              newTotal -= type['price'];
                                             }
                                           });
                                         },

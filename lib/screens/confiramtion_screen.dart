@@ -180,7 +180,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                                 if (selectedAddon['price'] !=
                                                     "Free") {
                                                   confirmationTotal -=
-                                                      selectedAddon['price'];
+                                                      selectedAddon['price']??0.0;
                                                 }
                                                 Provider.of<Categories>(context,
                                                         listen: false)
