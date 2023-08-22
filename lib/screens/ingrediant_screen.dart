@@ -122,7 +122,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                               builder: (context, categories, _) => TopSide(
                                   category['name'],
                                   categories.stepIndex,
-                                  type['message'])),
+                                  type['type']['message'])),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -136,7 +136,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                       .ingrediants
                                       .where((ingrediant) =>
                                           ingrediant['type']['name'] ==
-                                          type['name'])
+                                          type['type']['name'])
                                       .length,
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
@@ -149,7 +149,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                     List<dynamic> ingrediantsData = ingrediants
                                         .where((ingredient) =>
                                             ingredient['type']['name'] ==
-                                            type['name'])
+                                            type['type']['name'])
                                         .toList();
                                     int count = selectedIngrediants
                                         .where((element) =>
@@ -167,11 +167,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                         type['quantity'] > 1 &&
                                                 count2 >= type['free']
                                             ? double.parse(
-                                                type['price'].toString())
+                                                type['type']['price'].toString())
                                             : null,
                                         type['quantity'] > 1 &&
                                                 count2 >= type['free']
-                                            ? type['currency']
+                                            ? type['type']['currency']
                                             : null,
                                         () {
                                           if (type['quantity'] > 1) {
@@ -179,10 +179,10 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               setState(() {
                                                 if (count2 >= type['free']) {
                                                   ingrediantsData[index]
-                                                      ['price'] = type['price'];
-                                                  newTotal += type['price'];
+                                                      ['price'] = type['type']['price'];
+                                                  newTotal += type['type']['price'];
                                                   tot[ingredIndex] +=
-                                                      type['price'];
+                                                      type['type']['price'];
                                                 } else {
                                                   ingrediantsData[index]
                                                       ['price'] = 0.0;
@@ -204,7 +204,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                   context: context,
                                                   builder: ((context) {
                                                     return ErrorPopUp("Alert",
-                                                        "Il faut choisir que ${type['free']} ${type['name']} au maximum");
+                                                        "Il faut choisir que ${type['free']} ${type['type']['name']} au maximum");
                                                   }));
                                             } else {
                                               setState(() {
@@ -224,8 +224,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             selectedIngrediants
                                                 .remove(ingrediantsData[index]);
                                             if (count2 > type['free']) {
-                                              tot[ingredIndex] -= type['price'].toDouble();
-                                              newTotal -= type['price'];
+                                              tot[ingredIndex] -= type['type']['price'].toDouble();
+                                              newTotal -= type['type']['price'];
                                             }
                                           });
                                         },
@@ -276,7 +276,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         if (ingredIndex > 0) {
           setState(() {
             selectedIngrediants.removeWhere(
-                (ingrediant) => ingrediant['type']['name'] == type['name']);
+                (ingrediant) => ingrediant['type']['name'] == type['type']['name']);
             newTotal -= tot[ingredIndex];
             tot.removeLast();
           });
