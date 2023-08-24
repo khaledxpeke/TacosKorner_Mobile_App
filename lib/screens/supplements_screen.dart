@@ -49,6 +49,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
     supplements = Provider.of<Ingredients>(context).selectedIngrediants;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
+    Set<dynamic> displayedItems = {};
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
@@ -82,13 +83,23 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                               shrinkWrap: true,
                               itemCount: supplements.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return SideItem(
-                                  supplements[index]['image'],
-                                  supplements[index]['name'],
-                                  () {},
-                                  false,
-                                  0
-                                );
+                                final dynamic currentItem = supplements[index];
+                                final int count = supplements
+                                    .where(
+                                        (element) => element == supplements[index])
+                                    .length;
+                                if (displayedItems.contains(currentItem)) {
+                                  return Container();
+                                } else {
+                                  displayedItems.add(currentItem);
+                                  return SideItem(
+                                    currentItem['image'],
+                                    currentItem['name'],
+                                    () {},
+                                    false,
+                                    count,
+                                  );
+                                }
                               },
                             ),
                           ),
@@ -176,7 +187,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(supplements);
+            .setSelectedExtras(supplements);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
         setState(() {
@@ -192,7 +203,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
           supplements.removeWhere((item) => selectedSupplements.contains(item));
         });
         Provider.of<Ingredients>(context, listen: false)
-            .setSelectedIngrediants(supplements);
+            .setSelectedExtras(supplements);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();

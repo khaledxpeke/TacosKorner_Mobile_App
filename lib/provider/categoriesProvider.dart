@@ -79,17 +79,42 @@ class Categories with ChangeNotifier {
     notifyListeners();
   }
 
-  removeAddon(int productIndex, Map<String, dynamic> addon1) {
-    double removedAddonPrice = 0.0;
+  removeAddon(int productIndex, Map<String, dynamic> addon1, double price) {
+    // double removedAddonPrice = 0.0;
+    bool removed = false;
+
     products[productIndex]['addons'].removeWhere((addon) {
-      if (addon['name'] == addon1['name']) {
-      removedAddonPrice = addon['price']?.toDouble() ?? 0.0;
-      return true;
-    }
-    return false;
+      if (!removed && addon['name'] == addon1['name']) {
+        // removedAddonPrice = price;
+        removed = true;
+        return true;
+      }
+      return false;
     });
-    products[productIndex]['total'] -= removedAddonPrice;
-    notifyListeners();
+
+    if (removed) {
+      products[productIndex]['total'] -= price;
+      notifyListeners();
+    }
+  }
+
+  removeExtra(int productIndex, Map<String, dynamic> addon1) {
+    double removedAddonPrice = 0.0;
+    bool removed = false;
+
+    products[productIndex]['extras'].removeWhere((addon) {
+      if (!removed && addon['name'] == addon1['name']) {
+        removedAddonPrice = addon['price']?.toDouble() ?? 0.0;
+        removed = true;
+        return true;
+      }
+      return false;
+    });
+
+    if (removed) {
+      products[productIndex]['total'] -= removedAddonPrice;
+      notifyListeners();
+    }
   }
 
   removeAllProducts() {

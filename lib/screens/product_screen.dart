@@ -147,15 +147,19 @@ class _ProductScreenState extends State<ProductScreen> {
                                               }
                                             });
                                             int nb = 2;
-                                            if (categories[selectedCategory]
-                                                                ['products']
-                                                            [selectedProduct]
-                                                        ['choice']
-                                                    .toUpperCase() ==
-                                                "SEUL") {
-                                              nb = 2;
+                                            if (selectedProduct >= 0) {
+                                              if (categories[selectedCategory]
+                                                                  ['products']
+                                                              [selectedProduct]
+                                                          ['choice']
+                                                      .toUpperCase() ==
+                                                  "SEUL") {
+                                                nb = 2;
+                                              } else {
+                                                nb = 5;
+                                              }
                                             } else {
-                                              nb = 5;
+                                              nb = 2;
                                             }
                                             int nbSteps = (nb +
                                                     (categories[selectedCategory]

@@ -69,7 +69,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             Expanded(
               child: Center(
                 child: Container(
-                  width: 183.w,
+                  width: 230.w,
                   decoration: BoxDecoration(
                     color: lSilverColor,
                     borderRadius: BorderRadius.circular(20.r),
@@ -80,6 +80,44 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Name',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 10.sp,
+                                color: textColor,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  'PU',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 10.sp,
+                                    color: textColor,
+                                  ),
+                                ),
+                                SizedBox(width: 15.w),
+                                Text(
+                                  'TOT',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 10.sp,
+                                    color: textColor,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                        Divider(
+                          thickness: 2.h,
+                          color: darkColor,
+                        ),
                         Expanded(
                           child: Scrollbar(
                             thickness: 4.w,
@@ -106,59 +144,79 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                     final Map<String, dynamic> product =
                                         entry.value;
                                     return ConfirmationItem(
-                                      product,
-                                      products.length > 1 ? index + 1 : 0,
-                                      product['addons'],
-                                      () {
-                                        showDialog(
-                                          context: context,
-                                          builder: ((context) {
-                                            return ConfirmationMessage(
-                                              "Alert",
-                                              "Vous êtes sûr que vous voulez retirer ce produit!",
-                                              () {
-                                                setState(() {
+                                        product,
+                                        products.length > 1 ? index + 1 : 0,
+                                        product['addons'] ?? [],
+                                        product['extras'] ?? [], () {
+                                      showDialog(
+                                        context: context,
+                                        builder: ((context) {
+                                          return ConfirmationMessage(
+                                            "Alert",
+                                            "Vous êtes sûr que vous voulez retirer ce produit!",
+                                            () {
+                                              setState(() {
+                                                confirmationTotal -=
+                                                    product['total'];
+                                                Provider.of<Categories>(context,
+                                                        listen: false)
+                                                    .removeProduct(product);
+                                                products.remove(product);
+                                              });
+                                              Navigator.of(context).pop();
+                                            },
+                                          );
+                                        }),
+                                      );
+                                    }, (selectedAddon, price) {
+                                      showDialog(
+                                        context: context,
+                                        builder: ((context) {
+                                          return ConfirmationMessage(
+                                            "Alert",
+                                            "Vous êtes sûr que vous voulez retirer cet addon ?",
+                                            () {
+                                              setState(() {
+                                                if (selectedAddon['price'] !=
+                                                    "Free") {
                                                   confirmationTotal -=
-                                                      product['total'];
-                                                  Provider.of<Categories>(
-                                                          context,
-                                                          listen: false)
-                                                      .removeProduct(product);
-                                                  products.remove(product);
-                                                });
-                                                Navigator.of(context).pop();
-                                              },
-                                            );
-                                          }),
-                                        );
-                                      },
-                                      (selectedAddon) {
-                                        showDialog(
-                                          context: context,
-                                          builder: ((context) {
-                                            return ConfirmationMessage(
-                                              "Alert",
-                                              "Vous êtes sûr que vous voulez retirer cet addon ?",
-                                              () {
-                                                setState(() {
-                                                  if (selectedAddon['price'] !=
-                                                      "Free") {
-                                                    confirmationTotal -=
-                                                        selectedAddon['price'];
-                                                  }
-                                                  Provider.of<Categories>(
-                                                          context,
-                                                          listen: false)
-                                                      .removeAddon(
-                                                          index, selectedAddon);
-                                                });
-                                                Navigator.of(context).pop();
-                                              },
-                                            );
-                                          }),
-                                        );
-                                      },
-                                    );
+                                                      selectedAddon['price'];
+                                                }
+                                                Provider.of<Categories>(context,
+                                                        listen: false)
+                                                    .removeAddon(
+                                                        index, selectedAddon, price);
+                                              });
+                                              Navigator.of(context).pop();
+                                            },
+                                          );
+                                        }),
+                                      );
+                                    }, (selectedExtra) {
+                                      showDialog(
+                                        context: context,
+                                        builder: ((context) {
+                                          return ConfirmationMessage(
+                                            "Alert",
+                                            "Vous êtes sûr que vous voulez retirer ce extra ?",
+                                            () {
+                                              setState(() {
+                                                if (selectedExtra['price'] !=
+                                                    "Free") {
+                                                  confirmationTotal -=
+                                                      selectedExtra['price'];
+                                                }
+                                                Provider.of<Categories>(context,
+                                                        listen: false)
+                                                    .removeExtra(
+                                                        index, selectedExtra);
+                                              });
+                                              Navigator.of(context).pop();
+                                            },
+                                          );
+                                        }),
+                                      );
+                                    });
                                   }).toList(),
                                 ],
                               ),
