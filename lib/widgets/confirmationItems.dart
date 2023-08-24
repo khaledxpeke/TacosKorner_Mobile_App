@@ -30,7 +30,7 @@ class ConfirmationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<String, dynamic> lastProduct =
         Provider.of<Categories>(context).lastProduct;
-
+    int pointer = 0;
     return Padding(
       padding: EdgeInsets.only(bottom: 5.h),
       child: Column(
@@ -99,15 +99,27 @@ class ConfirmationItem extends StatelessWidget {
                               element['price'] == currentItem['price'])
                           .length;
                       double totalPrice = 0.0;
-                      int pointer = 0;
-                      for (int index = 0; index < addons.length; index++) {
-                        final item = addons[index];
-                        if (item['name'] == currentItem['name'] &&
-                            item['price'] == currentItem['price']) {
+                      if (currentItem['type'] != null && index > 0) {
+                        if (addons[index - 1]['type'] != null) {
+                          if (currentItem['type']['name'] !=
+                              addons[index - 1]['type']['name']) {
+                            pointer = 0;
+                          }
+                        }
+                      }
+                      for (int idx = 0; idx < addons.length; idx++) {
+                        final addon = addons[idx];
+                        if (addon['name'] == currentItem['name'] &&
+                            addon['price'] == currentItem['price']) {
                           final itemType = currentItem['type'];
+
                           if (itemType != null && itemType['free'] != null) {
-                            if (pointer >= itemType['free']) {
-                              totalPrice += item['price'] ?? 0.0;
+                            final free = plat['plat']['rules'].firstWhere(
+                                (type) =>
+                                    type['type']['name'] ==
+                                    currentItem['type']['name']);
+                            if (pointer >= free['free']) {
+                              totalPrice += addon['price'] ?? 0.0;
                             }
                             pointer += 1;
                           }
@@ -132,7 +144,9 @@ class ConfirmationItem extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  (item['price'] == null || item['price'] == 0)
+                                  item['price'] == null ||
+                                          item['price'] == 0 ||
+                                          item['price'] > totalPrice
                                       ? Container()
                                       : Text(
                                           "${item['price']}${plat['plat']['currency']}",

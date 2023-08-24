@@ -122,7 +122,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                               builder: (context, categories, _) => TopSide(
                                   category['name'],
                                   categories.stepIndex,
-                                  type['message'])),
+                                  type['type']['message'])),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: BouncingScrollPhysics(),
@@ -136,7 +136,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                       .ingrediants
                                       .where((ingrediant) =>
                                           ingrediant['type']['name'] ==
-                                          type['name'])
+                                          type['type']['name'])
                                       .length,
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
@@ -149,7 +149,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                     List<dynamic> ingrediantsData = ingrediants
                                         .where((ingredient) =>
                                             ingredient['type']['name'] ==
-                                            type['name'])
+                                            type['type']['name'])
                                         .toList();
                                     int count = selectedIngrediants
                                         .where((element) =>
@@ -167,11 +167,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                         type['quantity'] > 1 &&
                                                 count2 >= type['free']
                                             ? double.parse(
-                                                type['price'].toString())
+                                                type['type']['price'].toString())
                                             : null,
                                         type['quantity'] > 1 &&
                                                 count2 >= type['free']
-                                            ? type['currency']
+                                            ? type['type']['currency']
                                             : null,
                                         () {
                                           if (type['quantity'] > 1) {
@@ -179,10 +179,10 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               setState(() {
                                                 if (count2 >= type['free']) {
                                                   ingrediantsData[index]
-                                                      ['price'] = type['price'];
-                                                  newTotal += type['price'];
+                                                      ['price'] = type['type']['price'];
+                                                  newTotal += type['type']['price'];
                                                   tot[ingredIndex] +=
-                                                      type['price'];
+                                                      type['type']['price'];
                                                 } else {
                                                   ingrediantsData[index]
                                                       ['price'] = 0.0;
@@ -204,7 +204,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                                   context: context,
                                                   builder: ((context) {
                                                     return ErrorPopUp("Alert",
-                                                        "Il faut choisir que ${type['free']} ${type['name']} au maximum");
+                                                        "Il faut choisir que ${type['free']} ${type['type']['name']} au maximum");
                                                   }));
                                             } else {
                                               setState(() {
@@ -224,46 +224,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             selectedIngrediants
                                                 .remove(ingrediantsData[index]);
                                             if (count2 > type['free']) {
-                                              String typeName =
-                                                  ingrediantsData[index]['type']
-                                                      ['name'];
-                                              List list = selectedIngrediants
-                                                  .where((element) =>
-                                                      element['type']['name'] ==
-                                                      typeName)
-                                                  .toList();
-                                              int startIndex = type['free'];
-                                              List sublist =
-                                                  list.sublist(0, startIndex);
-                                              List sublist2 =
-                                                  list.sublist(startIndex);
-                                              if (sublist.isNotEmpty) {
-                                                for (var element in sublist) {
-                                                  element['price'] = 0.0;
-                                                }
-                                              }
-                                              if (sublist2.isNotEmpty) {
-                                                tot[ingredIndex] =
-                                                    (sublist2.length *
-                                                            type['price'])
-                                                        .toDouble();
-                                                for (var element in sublist2) {
-                                                  element['price'] = 1.0;
-                                                }
-                                              } else {
-                                                tot[ingredIndex] = 0;
-                                              }
-                                              selectedIngrediants.removeWhere(
-                                                  (element) =>
-                                                      element['type']['name'] ==
-                                                      typeName);
-                                              selectedIngrediants
-                                                ..addAll(sublist)
-                                                ..addAll(sublist2);
-                                              double sum = tot.reduce((value,
-                                                      element) =>
-                                                  value + element.toDouble());
-                                              newTotal = sum;
+                                              tot[ingredIndex] -= type['type']['price'].toDouble();
+                                              newTotal -= type['type']['price'];
                                             }
                                           });
                                         },
@@ -314,7 +276,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         if (ingredIndex > 0) {
           setState(() {
             selectedIngrediants.removeWhere(
-                (ingrediant) => ingrediant['type']['name'] == type['name']);
+                (ingrediant) => ingrediant['type']['name'] == type['type']['name']);
             newTotal -= tot[ingredIndex];
             tot.removeLast();
           });

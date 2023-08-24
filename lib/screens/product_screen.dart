@@ -209,7 +209,7 @@ class _ProductScreenState extends State<ProductScreen> {
               }));
         } else {
           List<dynamic> type =
-              categories[selectedCategory]['products'][selectedProduct]['type'];
+              categories[selectedCategory]['products'][selectedProduct]['rules'];
           List<dynamic> supplements = categories[selectedCategory]['products']
               [selectedProduct]['supplements'];
           Provider.of<Categories>(context, listen: false).setCategory(
@@ -225,6 +225,7 @@ class _ProductScreenState extends State<ProductScreen> {
             Provider.of<Categories>(context, listen: false).setProducts({
               "plat": categories[selectedCategory]['products'][selectedProduct],
               "addons": [],
+              "extras": [],
               "total": categories[selectedCategory]['products'][selectedProduct]
                   ['price']
             });
