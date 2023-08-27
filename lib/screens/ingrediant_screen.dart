@@ -256,7 +256,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
           });
         } else {
           Provider.of<Ingredients>(context, listen: false)
-              .setSelectedIngrediants(selectedIngrediants);
+            .setSelectedExtras(selectedIngrediants);
+          // Provider.of<Ingredients>(context, listen: false)
+          //     .setSelectedIngrediants(selectedIngrediants);
           Provider.of<Categories>(context, listen: false)
               .setTotal(total + newTotal);
           setState(() {

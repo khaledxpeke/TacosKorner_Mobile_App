@@ -64,7 +64,7 @@ class _DessertScreenState extends State<DessertScreen> {
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
     desserts = Provider.of<Ingredients>(context).selectedExtras;
-    extras = Provider.of<Ingredients>(context).selectedIngrediants;
+    extras = Provider.of<Ingredients>(context).selectedExtras;
     size = Provider.of<Ingredients>(context).size;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;

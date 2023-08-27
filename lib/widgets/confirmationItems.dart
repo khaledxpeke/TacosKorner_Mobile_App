@@ -112,12 +112,11 @@ class ConfirmationItem extends StatelessWidget {
                         if (addon['name'] == currentItem['name'] &&
                             addon['price'] == currentItem['price']) {
                           final itemType = currentItem['type'];
-
-                          if (itemType != null && itemType['free'] != null) {
+                          if (itemType != null) {
                             final free = plat['plat']['rules'].firstWhere(
                                 (type) =>
-                                    type['type']['name'] ==
-                                    currentItem['type']['name']);
+                                    type['type']['name'] == itemType['name'],
+                                orElse: () => null);
                             if (pointer >= free['free']) {
                               totalPrice += addon['price'] ?? 0.0;
                             }
