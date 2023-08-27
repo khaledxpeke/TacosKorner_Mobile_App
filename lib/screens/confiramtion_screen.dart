@@ -25,7 +25,7 @@ class ConfirmationScreen extends StatefulWidget {
 
 class _ConfirmationScreenState extends State<ConfirmationScreen> {
   double confirmationTotal = 0.0;
-  String currency = "DT";
+  String currency = "€";
   late ScrollController _scrollController;
   bool isLoading = false;
   String errorMessage = "";
@@ -51,7 +51,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     String formule = Provider.of<Categories>(context).formule;
     confirmationTotal =
         products.fold(0.0, (sum, product) => sum + product['total']);
-    currency = products.isNotEmpty ? products.first['plat']['currency'] : "DT";
+    currency = products.isNotEmpty ? products.first['plat']['currency'] : "€";
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(

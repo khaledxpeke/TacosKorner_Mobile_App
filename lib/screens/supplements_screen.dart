@@ -46,7 +46,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-    supplements = Provider.of<Ingredients>(context).selectedIngrediants;
+    supplements = Provider.of<Ingredients>(context).selectedExtras;
     double total = Provider.of<Categories>(context).total;
     int stepIndex = Provider.of<Categories>(context).stepIndex;
     Set<dynamic> displayedItems = {};
@@ -146,7 +146,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                         supplementsData[index]['image'],
                                         supplementsData[index]['name'],
                                         double.parse(supplementsData[index]['price'].toString()),
-                                        supplementsData[index]['currency'], () {
+                                        category['currency'], () {
                                       setState(() {
                                         if (supplements
                                             .contains(supplementsData[index])) {

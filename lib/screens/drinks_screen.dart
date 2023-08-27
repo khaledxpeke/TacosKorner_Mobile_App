@@ -169,7 +169,7 @@ class _DrinkScreenState extends State<DrinkScreen> {
                                                   double.parse(drinksData[index]
                                                           ['price']
                                                       .toString()),
-                                                  drinksData[index]['currency'],
+                                                  category['currency'],
                                                   () {
                                                     if (drinksData[index]
                                                             ['max'] >

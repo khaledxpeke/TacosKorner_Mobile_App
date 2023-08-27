@@ -46,7 +46,6 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> category = Provider.of<Categories>(context).category;
-
     Map<String, dynamic> type = Provider.of<Ingredients>(context).type;
     List<dynamic> ingrediants = Provider.of<Ingredients>(context).ingrediants;
     List<dynamic> types = Provider.of<Ingredients>(context).types;
@@ -164,23 +163,35 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                     return CategoryItem(
                                         ingrediantsData[index]['image'],
                                         ingrediantsData[index]['name'],
-                                        type['quantity'] > 1 &&
-                                                count2 >= type['free']
-                                            ? double.parse(
-                                                type['type']['price'].toString())
+                                        (type['quantity'] > 1 &&
+                                                    count2 >= type['free']) ||
+                                                type['free'] == 0
+                                            ? double.parse(type['type']['price']
+                                                .toString())
                                             : null,
-                                        type['quantity'] > 1 &&
-                                                count2 >= type['free']
-                                            ? type['type']['currency']
+                                        (type['quantity'] > 1 &&
+                                                    count2 >= type['free']) ||
+                                                type['free'] == 0
+                                            ? category['currency']
                                             : null,
                                         () {
                                           if (type['quantity'] > 1) {
+                                            if (count2 >= type['quantity']) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: ((context) {
+                                                    return ErrorPopUp("Alert",
+                                                        "Il faut choisir que ${type['quantity']} ${type['type']['name']} au maximum");
+                                                  }));
+                                            }
                                             if (count2 < type['quantity']) {
                                               setState(() {
                                                 if (count2 >= type['free']) {
                                                   ingrediantsData[index]
-                                                      ['price'] = type['type']['price'];
-                                                  newTotal += type['type']['price'];
+                                                          ['price'] =
+                                                      type['type']['price'];
+                                                  newTotal +=
+                                                      type['type']['price'];
                                                   tot[ingredIndex] +=
                                                       type['type']['price'];
                                                 } else {
@@ -194,12 +205,41 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                           } else if (selectedIngrediants
                                               .contains(
                                                   ingrediantsData[index])) {
+                                            if (type['free'] == 0) {
+                                              ingrediantsData[index]['price'] =
+                                                  type['type']['price'];
+                                              newTotal -= type['type']['price'];
+                                              tot[ingredIndex] -=
+                                                  type['type']['price'];
+                                            }
                                             setState(() {
                                               selectedIngrediants.remove(
                                                   ingrediantsData[index]);
                                             });
                                           } else {
-                                            if (count2 >= type['free']) {
+                                            if (type['free'] == 0) {
+                                              if (count2 >= type['quantity']) {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: ((context) {
+                                                      return ErrorPopUp("Alert",
+                                                          "Il faut choisir que ${type['quantity']} ${type['type']['name']} au maximum");
+                                                    }));
+                                              } else if (count2 <
+                                                  type['quantity']) {
+                                                setState(() {
+                                                  ingrediantsData[index]
+                                                          ['price'] =
+                                                      type['type']['price'];
+                                                  newTotal +=
+                                                      type['type']['price'];
+                                                  tot[ingredIndex] +=
+                                                      type['type']['price'];
+                                                  selectedIngrediants.add(
+                                                      ingrediantsData[index]);
+                                                });
+                                              }
+                                            } else if (count2 >= type['free']) {
                                               showDialog(
                                                   context: context,
                                                   builder: ((context) {
@@ -224,7 +264,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             selectedIngrediants
                                                 .remove(ingrediantsData[index]);
                                             if (count2 > type['free']) {
-                                              tot[ingredIndex] -= type['type']['price'].toDouble();
+                                              tot[ingredIndex] -= type['type']
+                                                      ['price']
+                                                  .toDouble();
                                               newTotal -= type['type']['price'];
                                             }
                                           });
@@ -246,28 +288,42 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         ),
       ),
       bottomSheet: bottomsheet(context, () {
-        Provider.of<Categories>(context, listen: false)
-            .setStepIndex(stepIndex + 1);
-        if (types.length - 1 > ingredIndex) {
-          Provider.of<Ingredients>(context, listen: false)
-              .setType(types[ingredIndex + 1], ingredIndex + 1);
-          setState(() {
-            tot.add(0);
-          });
+        bool hasSelectedIngredients = selectedIngrediants.any((element) {
+          return element['type']['name'] == type['type']['name'];
+        });
+        if (type['type']['isRequired'] && !hasSelectedIngredients) {
+          showDialog(
+              context: context,
+              builder: ((context) {
+                return ErrorPopUp(
+                  "Alert",
+                  "Il faut choisir au moins un ${type['type']['name']}",
+                );
+              }));
         } else {
-          Provider.of<Ingredients>(context, listen: false)
-              .setSelectedIngrediants(selectedIngrediants);
           Provider.of<Categories>(context, listen: false)
-              .setTotal(total + newTotal);
-          setState(() {
-            newTotal = 0;
-          });
-          if (category['supplements'].isNotEmpty) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SupplementsScreen()));
+              .setStepIndex(stepIndex + 1);
+          if (types.length - 1 > ingredIndex) {
+            Provider.of<Ingredients>(context, listen: false)
+                .setType(types[ingredIndex + 1], ingredIndex + 1);
+            setState(() {
+              tot.add(0);
+            });
           } else {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ExtraScreen()));
+            Provider.of<Ingredients>(context, listen: false)
+                .setSelectedExtras(selectedIngrediants);
+            Provider.of<Categories>(context, listen: false)
+                .setTotal(total + newTotal);
+            setState(() {
+              newTotal = 0;
+            });
+            if (category['supplements'].isNotEmpty) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SupplementsScreen()));
+            } else {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ExtraScreen()));
+            }
           }
         }
       }, () {
@@ -275,8 +331,8 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
             .setStepIndex(stepIndex - 1);
         if (ingredIndex > 0) {
           setState(() {
-            selectedIngrediants.removeWhere(
-                (ingrediant) => ingrediant['type']['name'] == type['type']['name']);
+            selectedIngrediants.removeWhere((ingrediant) =>
+                ingrediant['type']['name'] == type['type']['name']);
             newTotal -= tot[ingredIndex];
             tot.removeLast();
           });
