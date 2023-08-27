@@ -173,7 +173,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
                                                   double.parse(extrasData[index]
                                                           ['price']
                                                       .toString()),
-                                                  extrasData[index]['currency'],
+                                                  category['currency'],
                                                   () {
                                                     if (extrasData[index]
                                                             ['max'] >

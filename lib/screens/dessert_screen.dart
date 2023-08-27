@@ -176,8 +176,7 @@ class _DessertScreenState extends State<DessertScreen> {
                                                       dessertsData[index]
                                                               ['price']
                                                           .toString()),
-                                                  dessertsData[index]
-                                                      ['currency'],
+                                                  category['currency'],
                                                   () {
                                                     if (dessertsData[index]
                                                             ['max'] >

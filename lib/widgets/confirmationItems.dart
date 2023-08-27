@@ -251,7 +251,7 @@ class ConfirmationItem extends StatelessWidget {
                                   Padding(
                                     padding: EdgeInsets.only(right: 3.w),
                                     child: Text(
-                                      "${item['price'] == null || item['price'] == 0 ? "Free" : item['price']}${item['price'] == null || item['price'] == 0 ? "" : item['currency']}",
+                                      "${item['price'] == null || item['price'] == 0 ? "Free" : item['price']}${item['price'] == null || item['price'] == 0 ? "" : plat['plat']['currency']}",
                                       style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 10.sp,
@@ -260,7 +260,7 @@ class ConfirmationItem extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    "${item['price'] == null || item['price'] == 0 ? "Free" : item['price'] * count}${item['price'] == null || item['price'] == 0 ? "" : item['currency']}",
+                                    "${item['price'] == null || item['price'] == 0 ? "Free" : item['price'] * count}${item['price'] == null || item['price'] == 0 ? "" : plat['plat']['currency']}",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 10.sp,

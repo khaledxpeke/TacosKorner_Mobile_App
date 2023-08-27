@@ -146,7 +146,7 @@ class _SupplementsScreenState extends State<SupplementsScreen> {
                                         supplementsData[index]['image'],
                                         supplementsData[index]['name'],
                                         double.parse(supplementsData[index]['price'].toString()),
-                                        supplementsData[index]['currency'], () {
+                                        category['currency'], () {
                                       setState(() {
                                         if (supplements
                                             .contains(supplementsData[index])) {

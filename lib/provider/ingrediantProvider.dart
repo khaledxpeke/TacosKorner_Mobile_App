@@ -3,7 +3,6 @@
 import 'package:flutter/cupertino.dart';
 
 class Ingredients with ChangeNotifier {
-  // List<dynamic> selectedIngrediants = [];
   int size = 0;
   List<dynamic> types = [];
   Map<String, dynamic> type = {};
@@ -15,11 +14,6 @@ class Ingredients with ChangeNotifier {
     selectedExtras = selectedExtras1;
     notifyListeners();
   }
-
-  // setSelectedIngrediants(List<dynamic> selectedIngrediants1) {
-  //   selectedIngrediants = selectedIngrediants1;
-  //   notifyListeners();
-  // }
 
   setAddonsSize(int nb) {
     size = nb;
