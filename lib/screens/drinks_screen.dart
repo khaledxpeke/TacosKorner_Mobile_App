@@ -171,9 +171,8 @@ class _DrinkScreenState extends State<DrinkScreen> {
                                                       .toString()),
                                                   category['currency'],
                                                   () {
-                                                    if (drinksData[index]
-                                                            ['max'] >
-                                                        count) {
+                                                    if (category['maxDrink']>
+                                                        selectedDrink.length) {
                                                       setState(() {
                                                         newTotal +=
                                                             drinksData[index]
