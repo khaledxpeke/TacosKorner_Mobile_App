@@ -175,9 +175,8 @@ class _ExtraScreenState extends State<ExtraScreen> {
                                                       .toString()),
                                                   category['currency'],
                                                   () {
-                                                    if (extrasData[index]
-                                                            ['max'] >
-                                                        count) {
+                                                    if ( category['maxExtras']>
+                                                        selectedExtra.length) {
                                                       setState(() {
                                                         newTotal +=
                                                             extrasData[index]
@@ -223,7 +222,8 @@ class _ExtraScreenState extends State<ExtraScreen> {
       bottomSheet: bottomsheet(context, () {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex + 1);
-        Provider.of<Ingredients>(context, listen: false).setSelectedExtras(extras);
+        Provider.of<Ingredients>(context, listen: false)
+            .setSelectedExtras(extras);
         Provider.of<Categories>(context, listen: false)
             .setTotal(total + newTotal);
         setState(() {
@@ -238,7 +238,8 @@ class _ExtraScreenState extends State<ExtraScreen> {
         setState(() {
           extras.removeWhere((item) => selectedExtra.contains(item));
         });
-        Provider.of<Ingredients>(context, listen: false).setSelectedExtras(extras);
+        Provider.of<Ingredients>(context, listen: false)
+            .setSelectedExtras(extras);
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();

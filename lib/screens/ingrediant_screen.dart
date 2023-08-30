@@ -166,8 +166,9 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                         (type['quantity'] > 1 &&
                                                     count2 >= type['free']) ||
                                                 type['free'] == 0
-                                            ? double.parse(type['type']['price']
-                                                .toString())
+                                            ? double.parse(
+                                                ingrediantsData[index]['price']
+                                                    .toString())
                                             : null,
                                         (type['quantity'] > 1 &&
                                                     count2 >= type['free']) ||
@@ -187,16 +188,12 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             if (count2 < type['quantity']) {
                                               setState(() {
                                                 if (count2 >= type['free']) {
-                                                  ingrediantsData[index]
-                                                          ['price'] =
-                                                      type['type']['price'];
                                                   newTotal +=
-                                                      type['type']['price'];
+                                                      ingrediantsData[index]
+                                                          ['price'];
                                                   tot[ingredIndex] +=
-                                                      type['type']['price'];
-                                                } else {
-                                                  ingrediantsData[index]
-                                                      ['price'] = 0.0;
+                                                      ingrediantsData[index]
+                                                          ['price'];
                                                 }
                                                 selectedIngrediants.add(
                                                     ingrediantsData[index]);
@@ -206,11 +203,11 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               .contains(
                                                   ingrediantsData[index])) {
                                             if (type['free'] == 0) {
-                                              ingrediantsData[index]['price'] =
-                                                  type['type']['price'];
-                                              newTotal -= type['type']['price'];
+                                              newTotal -= ingrediantsData[index]
+                                                  ['price'];
                                               tot[ingredIndex] -=
-                                                  type['type']['price'];
+                                                  ingrediantsData[index]
+                                                      ['price'];
                                             }
                                             setState(() {
                                               selectedIngrediants.remove(
@@ -228,13 +225,12 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                               } else if (count2 <
                                                   type['quantity']) {
                                                 setState(() {
-                                                  ingrediantsData[index]
-                                                          ['price'] =
-                                                      type['type']['price'];
                                                   newTotal +=
-                                                      type['type']['price'];
+                                                      ingrediantsData[index]
+                                                          ['price'];
                                                   tot[ingredIndex] +=
-                                                      type['type']['price'];
+                                                      ingrediantsData[index]
+                                                          ['price'];
                                                   selectedIngrediants.add(
                                                       ingrediantsData[index]);
                                                 });
@@ -264,10 +260,24 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
                                             selectedIngrediants
                                                 .remove(ingrediantsData[index]);
                                             if (count2 > type['free']) {
-                                              tot[ingredIndex] -= type['type']
-                                                      ['price']
-                                                  .toDouble();
-                                              newTotal -= type['type']['price'];
+                                              String typeName =
+                                                  ingrediantsData[index]['type']
+                                                      ['name'];
+                                              List list = selectedIngrediants
+                                                  .where((element) =>
+                                                      element['type']['name'] ==
+                                                      typeName)
+                                                  .toList();
+                                              int startIndex = type['free'];
+                                              List sublist =
+                                                  list.sublist(startIndex);
+                                              newTotal -= tot[ingredIndex];
+                                              tot[ingredIndex] = sublist.fold(
+                                                  0,
+                                                  (double sum, item) =>
+                                                      sum +
+                                                      (item['price'] ?? 0));
+                                              newTotal += tot[ingredIndex];
                                             }
                                           });
                                         },

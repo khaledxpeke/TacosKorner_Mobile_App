@@ -178,9 +178,8 @@ class _DessertScreenState extends State<DessertScreen> {
                                                           .toString()),
                                                   category['currency'],
                                                   () {
-                                                    if (dessertsData[index]
-                                                            ['max'] >
-                                                        count) {
+                                                    if (category['maxDessert']>
+                                                        selectedDessert.length) {
                                                       setState(() {
                                                         newTotal +=
                                                             dessertsData[index]
