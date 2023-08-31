@@ -30,7 +30,6 @@ class ConfirmationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<String, dynamic> lastProduct =
         Provider.of<Categories>(context).lastProduct;
-    int pointer = 0;
     return Padding(
       padding: EdgeInsets.only(bottom: 5.h),
       child: Column(
@@ -90,41 +89,40 @@ class ConfirmationItem extends StatelessWidget {
                   padding: EdgeInsets.only(top: 5.h),
                   child: Column(
                     children: addons.asMap().entries.map((entry) {
-                      final int index = entry.key;
-                      final Map<String, dynamic> item = entry.value;
-                      final dynamic currentItem = addons[index];
+                      final Map<String, dynamic> currentItem = entry.value;
                       final int count = addons
                           .where((element) =>
                               element['name'] == currentItem['name'] &&
                               element['price'] == currentItem['price'])
                           .length;
+                      final itemType = currentItem['type'];
                       double totalPrice = 0.0;
-                      if (currentItem['type'] != null && index > 0) {
-                        if (addons[index - 1]['type'] != null) {
-                          if (currentItem['type']['name'] !=
-                              addons[index - 1]['type']['name']) {
-                            pointer = 0;
-                          }
+                      if (itemType != null) {
+                        final startIndex = plat['plat']['rules'].firstWhere(
+                            (type) => type['type']['name'] == itemType['name'],
+                            orElse: () => null);
+                        List filteredItems = addons
+                            .where((element) =>
+                                element['type'] != null &&
+                                element['type']['name'] ==
+                                    currentItem['type']['name'])
+                            .toList();
+                        if (startIndex != null &&
+                            startIndex['free'] >= 0 &&
+                            startIndex['free'] < filteredItems.length) {
+                          List sublist2 =
+                              filteredItems.sublist(startIndex['free']);
+                          totalPrice = sublist2
+                              .where(
+                                  (item) => item['name'] == currentItem['name'])
+                              .fold(
+                                  0.0,
+                                  (double sum, item) =>
+                                      sum + (item['price'] ?? 0));
+                        } else {
+                          totalPrice = 0;
                         }
-                      }
-                      for (int idx = 0; idx < addons.length; idx++) {
-                        final addon = addons[idx];
-                        if (addon['name'] == currentItem['name'] &&
-                            addon['price'] == currentItem['price']) {
-                          final itemType = currentItem['type'];
-                          if (itemType != null) {
-                            final free = plat['plat']['rules'].firstWhere(
-                                (type) =>
-                                    type['type']['name'] == itemType['name'],
-                                orElse: () => null);
-                            if (pointer >= free['free']) {
-                              totalPrice += addon['price'] ?? 0.0;
-                            }
-                            pointer += 1;
-                          }
-                        }
-                      }
-                      if (currentItem['type'] == null) {
+                      } else {
                         totalPrice = currentItem['price'].toDouble();
                       }
                       if (displayedItems.contains(currentItem)) {
@@ -135,7 +133,7 @@ class ConfirmationItem extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "X$count ${item['name']}",
+                                "X$count ${currentItem['name']}",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 10.sp,
@@ -143,20 +141,20 @@ class ConfirmationItem extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  item['price'] == null ||
-                                          item['price'] == 0 ||
-                                          item['price'] > totalPrice
+                                  currentItem['price'] == null ||
+                                          currentItem['price'] == 0 ||
+                                          currentItem['price'] > totalPrice
                                       ? Container()
                                       : Text(
-                                          "${item['price']}${plat['plat']['currency']}",
+                                          "${currentItem['price']}${plat['plat']['currency']}",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                             fontSize: 10.sp,
                                             color: textColor,
                                           ),
                                         ),
-                                  (item['price'] != null ||
-                                              item['price'] != 0) &&
+                                  (currentItem['price'] != null ||
+                                              currentItem['price'] != 0) &&
                                           totalPrice == 0
                                       ? Padding(
                                           padding: EdgeInsets.only(left: 3.w),
@@ -184,12 +182,15 @@ class ConfirmationItem extends StatelessWidget {
                                       ? Container()
                                       : GestureDetector(
                                           onTap: () => removeAddon(
-                                              item,
-                                              (item['price'] != null ||
-                                                          item['price'] != 0) &&
+                                              currentItem,
+                                              (currentItem['price'] != null ||
+                                                          currentItem[
+                                                                  'price'] !=
+                                                              0) &&
                                                       totalPrice == 0
                                                   ? 0.0
-                                                  : item['price'].toDouble()),
+                                                  : currentItem['price']
+                                                      .toDouble()),
                                           child: Padding(
                                             padding: EdgeInsets.only(left: 4.w),
                                             child: Text(
