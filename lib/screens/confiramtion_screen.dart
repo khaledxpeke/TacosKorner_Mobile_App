@@ -306,6 +306,61 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     "Alert", "veuillez sélectionner un produit d'abord");
               }));
         } else {
+          Set<Map<String, dynamic>> displayedItems = {};
+          List<Map<String, dynamic>> addons = [];
+
+          products.forEach((product) {
+            product['addons'].asMap().entries.forEach((entry) {
+              final Map<String, dynamic> currentItem = entry.value;
+              final int count = product['addons']
+                  .where((element) =>
+                      element['name'] == currentItem['name'] &&
+                      element['price'] == currentItem['price'])
+                  .length;
+              final itemType = currentItem['type'];
+              double totalPrice = 0.0;
+
+              if (itemType != null) {
+                final startIndex = product['plat']['rules'].firstWhere(
+                    (type) => type['type']['name'] == itemType['name'],
+                    orElse: () => null);
+                List filteredItems = product['addons']
+                    .where((element) =>
+                        element['type'] != null &&
+                        element['type']['name'] == currentItem['type']['name'])
+                    .toList();
+
+                if (startIndex != null &&
+                    startIndex['free'] >= 0 &&
+                    startIndex['free'] < filteredItems.length) {
+                  List sublist2 = filteredItems.sublist(startIndex['free']);
+                  totalPrice = sublist2
+                      .where((item) => item['name'] == currentItem['name'])
+                      .fold(0.0,
+                          (double sum, item) => sum + (item['price'] ?? 0));
+                } else {
+                  totalPrice = 0;
+                }
+              } else {
+                totalPrice = currentItem['price'].toDouble();
+              }
+
+              Map<String, dynamic> addonInfo = {
+                "name": currentItem['name'],
+                "price": totalPrice,
+                "count": count
+              };
+
+              if (!displayedItems.contains(addonInfo)) {
+                displayedItems.add(addonInfo);
+                addons.add(addonInfo);
+              }
+            });
+
+            product['addons'] = addons;
+            addons = [];
+          });
+
           List<dynamic> productsHistory = products
               .map((product) => {
                     'plat': product['plat']['_id'],
@@ -313,6 +368,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     'extras': product['extras']
                   })
               .toList();
+          print(productsHistory);
           setState(() {
             isLoading = true;
           });
