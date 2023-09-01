@@ -174,18 +174,19 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                         builder: ((context) {
                                           return ConfirmationMessage(
                                             "Alert",
-                                            "Vous êtes sûr que vous voulez retirer cet addon ?",
+                                            "Vous êtes sûr que vous voulez retirer ce addon!",
                                             () {
                                               setState(() {
                                                 if (selectedAddon['price'] !=
                                                     "Free") {
                                                   confirmationTotal -=
-                                                      selectedAddon['price']??0.0;
+                                                      selectedAddon['price'] ??
+                                                          0.0;
                                                 }
                                                 Provider.of<Categories>(context,
                                                         listen: false)
-                                                    .removeAddon(
-                                                        index, selectedAddon, price);
+                                                    .removeAddon(index,
+                                                        selectedAddon, price);
                                               });
                                               Navigator.of(context).pop();
                                             },
@@ -198,7 +199,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                         builder: ((context) {
                                           return ConfirmationMessage(
                                             "Alert",
-                                            "Vous êtes sûr que vous voulez retirer ce extra ?",
+                                            "Vous êtes sûr que vous voulez retirer ce extra!",
                                             () {
                                               setState(() {
                                                 if (selectedExtra['price'] !=
@@ -306,8 +307,11 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               }));
         } else {
           List<dynamic> productsHistory = products
-              .map((product) =>
-                  {'plat': product['plat']['_id'], 'addons': product['addons'], 'extras': product['extras']})
+              .map((product) => {
+                    'plat': product['plat']['_id'],
+                    'addons': product['addons'],
+                    'extras': product['extras']
+                  })
               .toList();
           setState(() {
             isLoading = true;
