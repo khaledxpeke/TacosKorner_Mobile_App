@@ -306,7 +306,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     "Alert", "veuillez sélectionner un produit d'abord");
               }));
         } else {
-          Set<Map<String, dynamic>> displayedItems = {};
           List<Map<String, dynamic>> addons = [];
 
           products.forEach((product) {
@@ -341,22 +340,27 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 } else {
                   totalPrice = 0;
                 }
+              } else if (currentItem['price'] != null) {
+                totalPrice = currentItem['price'].toDouble() ?? 0;
               } else {
-                totalPrice = currentItem['price'].toDouble();
+                totalPrice = 0;
               }
 
               Map<String, dynamic> addonInfo = {
+                "_id":currentItem['_id'],
                 "name": currentItem['name'],
-                "price": totalPrice,
-                "count": count
+                "total": totalPrice,
+                "count": count,
+                "pu": currentItem['price'] ?? 0,
               };
+              bool entryExists = addons.any((element) =>
+                  element['name'] == currentItem['name'] &&
+                  element['total'] == totalPrice);
 
-              if (!displayedItems.contains(addonInfo)) {
-                displayedItems.add(addonInfo);
+              if (!entryExists) {
                 addons.add(addonInfo);
               }
             });
-
             product['addons'] = addons;
             addons = [];
           });
@@ -368,7 +372,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     'extras': product['extras']
                   })
               .toList();
-          print(productsHistory);
           setState(() {
             isLoading = true;
           });
