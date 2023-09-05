@@ -80,18 +80,17 @@ class Categories with ChangeNotifier {
   }
 
   removeAddon(int productIndex, Map<String, dynamic> addon1, double price) {
-    // double removedAddonPrice = 0.0;
     bool removed = false;
-
-    products[productIndex]['addons'].removeWhere((addon) {
+    List<dynamic> addons = products[productIndex]['addons'];
+    List<dynamic> reversedAddons = List.from(addons.reversed);
+    reversedAddons.removeWhere((addon) {
       if (!removed && addon['name'] == addon1['name']) {
-        // removedAddonPrice = price;
         removed = true;
         return true;
       }
       return false;
     });
-
+    products[productIndex]['addons'] = List.from(reversedAddons.reversed);
     if (removed) {
       products[productIndex]['total'] -= price;
       notifyListeners();

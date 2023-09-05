@@ -122,8 +122,10 @@ class ConfirmationItem extends StatelessWidget {
                         } else {
                           totalPrice = 0;
                         }
+                      } else if (currentItem['price'] != null) {
+                        totalPrice = currentItem['price'].toDouble() ?? 0;
                       } else {
-                        totalPrice = currentItem['price'].toDouble();
+                        totalPrice = 0;
                       }
                       if (displayedItems.contains(currentItem)) {
                         return Container();

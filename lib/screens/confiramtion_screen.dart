@@ -174,18 +174,19 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                         builder: ((context) {
                                           return ConfirmationMessage(
                                             "Alert",
-                                            "Vous êtes sûr que vous voulez retirer cet addon ?",
+                                            "Vous êtes sûr que vous voulez retirer ce addon!",
                                             () {
                                               setState(() {
                                                 if (selectedAddon['price'] !=
                                                     "Free") {
                                                   confirmationTotal -=
-                                                      selectedAddon['price']??0.0;
+                                                      selectedAddon['price'] ??
+                                                          0.0;
                                                 }
                                                 Provider.of<Categories>(context,
                                                         listen: false)
-                                                    .removeAddon(
-                                                        index, selectedAddon, price);
+                                                    .removeAddon(index,
+                                                        selectedAddon, price);
                                               });
                                               Navigator.of(context).pop();
                                             },
@@ -198,7 +199,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                         builder: ((context) {
                                           return ConfirmationMessage(
                                             "Alert",
-                                            "Vous êtes sûr que vous voulez retirer ce extra ?",
+                                            "Vous êtes sûr que vous voulez retirer ce extra!",
                                             () {
                                               setState(() {
                                                 if (selectedExtra['price'] !=
@@ -305,9 +306,71 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     "Alert", "veuillez sélectionner un produit d'abord");
               }));
         } else {
+          List<Map<String, dynamic>> addons = [];
+
+          products.forEach((product) {
+            product['addons'].asMap().entries.forEach((entry) {
+              final Map<String, dynamic> currentItem = entry.value;
+              final int count = product['addons']
+                  .where((element) =>
+                      element['name'] == currentItem['name'] &&
+                      element['price'] == currentItem['price'])
+                  .length;
+              final itemType = currentItem['type'];
+              double totalPrice = 0.0;
+
+              if (itemType != null) {
+                final startIndex = product['plat']['rules'].firstWhere(
+                    (type) => type['type']['name'] == itemType['name'],
+                    orElse: () => null);
+                List filteredItems = product['addons']
+                    .where((element) =>
+                        element['type'] != null &&
+                        element['type']['name'] == currentItem['type']['name'])
+                    .toList();
+
+                if (startIndex != null &&
+                    startIndex['free'] >= 0 &&
+                    startIndex['free'] < filteredItems.length) {
+                  List sublist2 = filteredItems.sublist(startIndex['free']);
+                  totalPrice = sublist2
+                      .where((item) => item['name'] == currentItem['name'])
+                      .fold(0.0,
+                          (double sum, item) => sum + (item['price'] ?? 0));
+                } else {
+                  totalPrice = 0;
+                }
+              } else if (currentItem['price'] != null) {
+                totalPrice = currentItem['price'].toDouble() ?? 0;
+              } else {
+                totalPrice = 0;
+              }
+
+              Map<String, dynamic> addonInfo = {
+                "_id":currentItem['_id'],
+                "name": currentItem['name'],
+                "total": totalPrice,
+                "count": count,
+                "pu": currentItem['price'] ?? 0,
+              };
+              bool entryExists = addons.any((element) =>
+                  element['name'] == currentItem['name'] &&
+                  element['total'] == totalPrice);
+
+              if (!entryExists) {
+                addons.add(addonInfo);
+              }
+            });
+            product['addons'] = addons;
+            addons = [];
+          });
+
           List<dynamic> productsHistory = products
-              .map((product) =>
-                  {'plat': product['plat']['_id'], 'addons': product['addons'], 'extras': product['extras']})
+              .map((product) => {
+                    'plat': product['plat']['_id'],
+                    'addons': product['addons'],
+                    'extras': product['extras']
+                  })
               .toList();
           setState(() {
             isLoading = true;
