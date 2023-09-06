@@ -368,7 +368,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               final int count = product['extras']
                   .where((element) => element == product['extras'][index])
                   .length;
-              double price = currentItem['price'].toDouble() ?? 0;
+              double price = 0;
+              if (currentItem['price'] != null) {
+                price = currentItem['price'].toDouble();
+              }
               Map<String, dynamic> extraInfo = {
                 "_id": currentItem['_id'],
                 "name": currentItem['name'],
@@ -407,37 +410,40 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           String transformToJsonToText(List data) {
             StringBuffer text = StringBuffer();
             text.write("[align: center][font: a]");
+            text.write(
+                "[image: url https://i.pinimg.com/236x/1c/e4/e7/1ce4e72b3569b59d066d2a69ddbd2934.jpg; width 40%;min-width 32mm]\n");
             text.write("[magnify: width 3; height 1]");
-            text.write("Reçu");
+            text.write("[align: middle]Reçu\n");
             text.write("[magnify]");
-            text.write("[align: left]");
+            text.write("\n");
             text.write("[column: left:  Name;     right: PU        TOT]");
-            text.write("--------------------------------");
+            text.write("--------------------------------\n");
             int entryIndex = 0;
             int totalEntries = data.length;
             for (var entry in data) {
               entryIndex++;
               text.write(
-                  "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]");
+                  "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]\n");
               if (entry['addons'].isNotEmpty) {
-                text.write("");
+                text.write("\n");
                 for (var addon in entry['addons']) {
                   text.write(
-                      "[column: left: ${addon['name']};      right: ${addon['total'] == 0 ? ' ' : addon['total']}          ${addon['total'] == 0 ? '--' : addon['pu']}]");
+                      "[column: left: X${addon['count']} ${addon['name']};      right: ${addon['total'] == 0 ? '' : addon['pu']}        ${addon['total'] == 0 ? '--' : addon['total']}]\n");
                 }
               }
               if (entry['extras'].isNotEmpty) {
-                text.write("[align: middle]Extras");
+                text.write("[align: middle][bold: on]Extras[bold: off]");
                 for (var extra in entry['extras']) {
                   text.write(
-                      "[column: left: ${extra['name']};      right: ${extra['total'] == 0 ? ' ' : extra['total']}          ${extra['total'] == 0 ? 'Gratuit' : extra['pu']}]");
+                      "[column: left: X${extra['count']} ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]\n");
                 }
               }
               if (entryIndex < totalEntries) {
-                text.write("--------------------------------");
+                text.write("--------------------------------\n");
               }
             }
-            text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
+            // text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
+            text.write("________________________________");
             text.write("[align: center]");
             text.write("[magnify: width 2; height 1]");
             text.write("[bold: on]Total : $confirmationTotal $currency [bold]");
@@ -450,24 +456,27 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           }
 
           String formattedText = transformToJsonToText(productsHistory);
-          print(formattedText);
           Printer printer = Printer();
           errorMessage = await printer
               .billPrinter(formattedText)
               .whenComplete(() => setState(() {
                     isLoading = false;
                   }));
-          if (errorMessage == "success") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PaiementScreen()));
-          } else {
-            print(errorMessage);
-            showDialog(
-                context: context,
-                builder: ((context) {
-                  return ErrorPopUp("Alert", errorMessage);
-                }));
-          }
+          // if (errorMessage == "success") {
+          //   Provider.of<Categories>(context, listen: false).setStepIndex(0);
+          //   Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
+          //   Provider.of<Categories>(context, listen: false).setNbSteps(5);
+          //   Provider.of<Categories>(context, listen: false).removeAllProducts();
+          //   Navigator.push(context,
+          //       MaterialPageRoute(builder: (context) => PaiementScreen()));
+          // } else {
+          //   print(errorMessage);
+          //   showDialog(
+          //       context: context,
+          //       builder: ((context) {
+          //         return ErrorPopUp("Alert", errorMessage);
+          //       }));
+          // }
           // Histories histories = Histories();
           // errorMessage = await histories
           //     .addHistory(productsHistory, formule,
