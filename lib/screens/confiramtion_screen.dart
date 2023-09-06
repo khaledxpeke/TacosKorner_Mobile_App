@@ -407,41 +407,50 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           String transformToJsonToText(List data) {
             StringBuffer text = StringBuffer();
             text.write("[align: center][font: a]");
+            text.write(
+                "[image: url https://star-emea.com/wp-content/uploads/2015/01/logo.jpg; width 40%;min-width 32mm]\n");
             text.write("[magnify: width 3; height 1]");
             text.write("Reçu");
             text.write("[magnify]");
             text.write("[align: left]");
             text.write("[column: left:  Name;     right: PU        TOT]");
-            text.write("------------------------------------------------");
+            text.write("--------------------------------\n");
             int entryIndex = 0;
             int totalEntries = data.length;
             for (var entry in data) {
               entryIndex++;
               text.write(
-                  "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]");
-              text.write("");
+                  "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]\n");
+              if (entry['addons'].isNotEmpty) {
+                text.write("");
+              }
+              text.write("\n");
               for (var addon in entry['addons']) {
+                final int count = entry['addons']
+                    .where((element) =>
+                        element['name'] == addon['name'] &&
+                        element['price'] == addon['price'])
+                    .length;
                 text.write(
-                    "[column: left: ${addon['name']};      right: ${addon['total'] == 0 ? ' ' : addon['total']} ${addon['total'] == 0 ? '--' : addon['pu']}]");
+                    "[column: left: X$count ${addon['name']};      right: ${addon['total'] == 0 ? '' : addon['pu']}        ${addon['total'] == 0 ? '--' : addon['total']}]\n");
               }
               if (entry['extras'].isNotEmpty) {
                 text.write("[align: middle]Extras");
                 for (var extra in entry['extras']) {
                   text.write(
-                      "[column: left: ${extra['name']};      right: ${extra['total'] == 0 ? ' ' : extra['total']} ${extra['total'] == 0 ? 'Gratuit' : extra['pu']}]");
+                      "[column: left: ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]\n");
                 }
               }
               if (entryIndex < totalEntries) {
-                text.write("------------------------------------------------");
+                text.write("--------------------------------\n");
               }
             }
-            text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
+            text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
             text.write("[align: center]");
             text.write("[magnify: width 2; height 1]");
             text.write("[bold: on]Total : $confirmationTotal $currency [bold]");
             text.write("[magnify]");
-            text.write(
-                "[barcode: type code39;data 123456789012;height 15mm;module 0;hri]");
+            text.write("[barcode: type code39; data ABC123 ;module 0;hri]");
             text.write("[align middle]");
             text.write("Merci et à la prochaine!");
             text.write("[cut: feed; partial]");
