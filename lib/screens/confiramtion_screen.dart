@@ -461,6 +461,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PaiementScreen()));
           } else {
+            print(errorMessage);
             showDialog(
                 context: context,
                 builder: ((context) {

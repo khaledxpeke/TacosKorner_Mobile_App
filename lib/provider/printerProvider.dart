@@ -16,9 +16,9 @@ class Printer with ChangeNotifier {
           Uri.parse(
               "https://api.starprinter.online/v1/a/layatech/d/ed7ce236/q"),
           headers: headers,
-          body: {});
+          body: confirmation);
       final body = json.decode(response.body);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         confirmation = body;
         notifyListeners();
         return "success";
