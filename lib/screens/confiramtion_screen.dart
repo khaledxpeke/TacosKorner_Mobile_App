@@ -412,40 +412,40 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             text.write("[magnify]");
             text.write("[align: left]");
             text.write("[column: left:  Name;     right: PU        TOT]");
-            text.write("------------------------------------------------");
+            text.write("--------------------------------");
             int entryIndex = 0;
             int totalEntries = data.length;
             for (var entry in data) {
               entryIndex++;
               text.write(
                   "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]");
-              text.write("");
-              for (var addon in entry['addons']) {
-                text.write(
-                    "[column: left: ${addon['name']};      right: ${addon['total'] == 0 ? ' ' : addon['total']} ${addon['total'] == 0 ? '--' : addon['pu']}]");
+              if (entry['addons'].isNotEmpty) {
+                text.write("");
+                for (var addon in entry['addons']) {
+                  text.write(
+                      "[column: left: ${addon['name']};      right: ${addon['total'] == 0 ? ' ' : addon['total']}          ${addon['total'] == 0 ? '--' : addon['pu']}]");
+                }
               }
               if (entry['extras'].isNotEmpty) {
                 text.write("[align: middle]Extras");
                 for (var extra in entry['extras']) {
                   text.write(
-                      "[column: left: ${extra['name']};      right: ${extra['total'] == 0 ? ' ' : extra['total']} ${extra['total'] == 0 ? 'Gratuit' : extra['pu']}]");
+                      "[column: left: ${extra['name']};      right: ${extra['total'] == 0 ? ' ' : extra['total']}          ${extra['total'] == 0 ? 'Gratuit' : extra['pu']}]");
                 }
               }
               if (entryIndex < totalEntries) {
-                text.write("------------------------------------------------");
+                text.write("--------------------------------");
               }
             }
-            text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
+            text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
             text.write("[align: center]");
             text.write("[magnify: width 2; height 1]");
             text.write("[bold: on]Total : $confirmationTotal $currency [bold]");
             text.write("[magnify]");
-            text.write(
-                "[barcode: type code39;data 123456789012;height 15mm;module 0;hri]");
+            text.write("[barcode: type code39; data ABC123 ;module 0;hri]");
             text.write("[align middle]");
             text.write("Merci et à la prochaine!");
             text.write("[cut: feed; partial]");
-
             return text.toString();
           }
 

@@ -10,7 +10,7 @@ class Printer with ChangeNotifier {
     "Content-Type": "text/vnd.star.markup",
     'Star-Api-Key': 'b8a5a7ef-0180-44c5-ac5d-d0b966637dc7'
   };
-  Future<String> billPrinter(String confirmation) async {
+  Future<String> billPrinter(dynamic confirmation) async {
     try {
       final response = await http.post(
           Uri.parse(
