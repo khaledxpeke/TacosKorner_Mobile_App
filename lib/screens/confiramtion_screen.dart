@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/history.dart';
+import 'package:takos_korner/provider/printerProvider.dart';
 import 'package:takos_korner/screens/category_screen.dart';
 import 'package:takos_korner/screens/paiement_screen.dart';
 import 'package:takos_korner/utils/colors.dart';
@@ -307,6 +308,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               }));
         } else {
           List<Map<String, dynamic>> addons = [];
+          List<Map<String, dynamic>> extras = [];
 
           products.forEach((product) {
             product['addons'].asMap().entries.forEach((entry) {
@@ -347,7 +349,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               }
 
               Map<String, dynamic> addonInfo = {
-                "_id":currentItem['_id'],
+                "_id": currentItem['_id'],
                 "name": currentItem['name'],
                 "total": totalPrice,
                 "count": count,
@@ -356,37 +358,106 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
               bool entryExists = addons.any((element) =>
                   element['name'] == currentItem['name'] &&
                   element['total'] == totalPrice);
-
               if (!entryExists) {
                 addons.add(addonInfo);
               }
             });
+            product['extras'].asMap().entries.forEach((entry) {
+              final int index = entry.key;
+              final Map<String, dynamic> currentItem = entry.value;
+              final int count = product['extras']
+                  .where((element) => element == product['extras'][index])
+                  .length;
+              double price = currentItem['price'].toDouble() ?? 0;
+              Map<String, dynamic> extraInfo = {
+                "_id": currentItem['_id'],
+                "name": currentItem['name'],
+                "total": price * count,
+                "count": count,
+                "pu": price,
+              };
+              bool entryExists = extras.any((element) =>
+                  element['name'] == currentItem['name'] &&
+                  element['total'] == price * count);
+              if (!entryExists) {
+                extras.add(extraInfo);
+              }
+            });
             product['addons'] = addons;
             addons = [];
+            product['extras'] = extras;
+            extras = [];
           });
-
           List<dynamic> productsHistory = products
               .map((product) => {
-                    'plat': product['plat']['_id'],
+                    'plat': {
+                      "_id": product['plat']['_id'],
+                      "name": product['plat']['name'],
+                      "price": product['plat']['price'],
+                      "currency": product['plat']['currency'],
+                    },
                     'addons': product['addons'],
                     'extras': product['extras']
                   })
               .toList();
+
           setState(() {
             isLoading = true;
           });
-          Histories histories = Histories();
-          errorMessage = await histories
-              .addHistory(productsHistory, formule,
-                  confirmationTotal.toString() + currency)
+          String transformToJsonToText(List data) {
+            StringBuffer text = StringBuffer();
+            text.write("[align: center][font: a]");
+            text.write("[magnify: width 3; height 1]");
+            text.write("Reçu");
+            text.write("[magnify]");
+            text.write("[align: left]");
+            text.write("[column: left:  Name;     right: PU        TOT]");
+            text.write("------------------------------------------------");
+            int entryIndex = 0;
+            int totalEntries = data.length;
+            for (var entry in data) {
+              entryIndex++;
+              text.write(
+                  "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]");
+              text.write("");
+              for (var addon in entry['addons']) {
+                text.write(
+                    "[column: left: ${addon['name']};      right: ${addon['total'] == 0 ? ' ' : addon['total']} ${addon['total'] == 0 ? '--' : addon['pu']}]");
+              }
+              if (entry['extras'].isNotEmpty) {
+                text.write("[align: middle]Extras");
+                for (var extra in entry['extras']) {
+                  text.write(
+                      "[column: left: ${extra['name']};      right: ${extra['total'] == 0 ? ' ' : extra['total']} ${extra['total'] == 0 ? 'Gratuit' : extra['pu']}]");
+                }
+              }
+              if (entryIndex < totalEntries) {
+                text.write("------------------------------------------------");
+              }
+            }
+            text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
+            text.write("[align: center]");
+            text.write("[magnify: width 2; height 1]");
+            text.write("[bold: on]Total : $confirmationTotal $currency [bold]");
+            text.write("[magnify]");
+            text.write(
+                "[barcode: type code39;data 123456789012;height 15mm;module 0;hri]");
+            text.write("[align middle]");
+            text.write("Merci et à la prochaine!");
+            text.write("[cut: feed; partial]");
+
+            return text.toString();
+          }
+
+          String formattedText = transformToJsonToText(productsHistory);
+          print(formattedText);
+          Printer printer = Printer();
+          errorMessage = await printer
+              .billPrinter(formattedText)
               .whenComplete(() => setState(() {
                     isLoading = false;
                   }));
           if (errorMessage == "success") {
-            Provider.of<Categories>(context, listen: false).setStepIndex(0);
-            Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
-            Provider.of<Categories>(context, listen: false).setNbSteps(5);
-            Provider.of<Categories>(context, listen: false).removeAllProducts();
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PaiementScreen()));
           } else {
@@ -396,6 +467,27 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                   return ErrorPopUp("Alert", errorMessage);
                 }));
           }
+          // Histories histories = Histories();
+          // errorMessage = await histories
+          //     .addHistory(productsHistory, formule,
+          //         confirmationTotal.toString() + currency)
+          //     .whenComplete(() => setState(() {
+          //           isLoading = false;
+          //         }));
+          // if (errorMessage == "success") {
+          //   Provider.of<Categories>(context, listen: false).setStepIndex(0);
+          //   Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
+          //   Provider.of<Categories>(context, listen: false).setNbSteps(5);
+          //   Provider.of<Categories>(context, listen: false).removeAllProducts();
+          //   Navigator.push(context,
+          //       MaterialPageRoute(builder: (context) => PaiementScreen()));
+          // } else {
+          //   showDialog(
+          //       context: context,
+          //       builder: ((context) {
+          //         return ErrorPopUp("Alert", errorMessage);
+          //       }));
+          // }
         }
       }, () {
         if (products.isEmpty) {
