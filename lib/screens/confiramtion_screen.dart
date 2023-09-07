@@ -408,7 +408,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             StringBuffer text = StringBuffer();
             text.write("[align: center][font: a]");
             text.write(
-                "[image: url https://star-emea.com/wp-content/uploads/2015/01/logo.jpg; width 40%;min-width 32mm]\n");
+                "[image: url https://star-emea.com/wp-content/uploads/2015/01/logo.jpg; width 40%;min-width 25mm]");
             text.write("[magnify: width 3; height 1]");
             text.write("Reçu");
             text.write("[magnify]");
