@@ -257,7 +257,7 @@ class _ProductScreenState extends State<ProductScreen> {
       }, () {
         Provider.of<Categories>(context, listen: false).setStepIndex(0);
         Navigator.of(context).pop();
-      }, false),
+      }),
     );
   }
 }

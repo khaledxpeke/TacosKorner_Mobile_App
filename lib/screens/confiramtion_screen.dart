@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:takos_korner/provider/history.dart';
 import 'package:takos_korner/provider/printerProvider.dart';
@@ -56,7 +57,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     return Scaffold(
       backgroundColor: lightColor,
       body: SafeArea(
-        child: Column(
+          child: Stack(children: [
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 6.h),
@@ -297,224 +299,226 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             SizedBox(height: 92.h),
           ],
         ),
-      ),
-      bottomSheet: bottomsheet(context, () async {
-        if (confirmationTotal == 0) {
-          showDialog(
-              context: context,
-              builder: ((context) {
-                return ErrorPopUp(
-                    "Alert", "veuillez sélectionner un produit d'abord");
-              }));
-        } else {
-          List<Map<String, dynamic>> addons = [];
-          List<Map<String, dynamic>> extras = [];
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: bottomsheet(context, () async {
+            if (confirmationTotal == 0) {
+              showDialog(
+                  context: context,
+                  builder: ((context) {
+                    return ErrorPopUp(
+                        "Alert", "veuillez sélectionner un produit d'abord");
+                  }));
+            } else {
+              setState(() {
+                isLoading = true;
+              });
+              List<Map<String, dynamic>> addons = [];
+              List<Map<String, dynamic>> extras = [];
+              for (var product in products) {
+                product['addons'].asMap().entries.forEach((entry) {
+                  final Map<String, dynamic> currentItem = entry.value;
+                  final int count = product['addons']
+                      .where((element) =>
+                          element['name'] == currentItem['name'] &&
+                          element['price'] == currentItem['price'])
+                      .length;
+                  final itemType = currentItem['type'];
+                  double totalPrice = 0.0;
 
-          products.forEach((product) {
-            product['addons'].asMap().entries.forEach((entry) {
-              final Map<String, dynamic> currentItem = entry.value;
-              final int count = product['addons']
-                  .where((element) =>
+                  if (itemType != null) {
+                    final startIndex = product['plat']['rules'].firstWhere(
+                        (type) => type['type']['name'] == itemType['name'],
+                        orElse: () => null);
+                    List filteredItems = product['addons']
+                        .where((element) =>
+                            element['type'] != null &&
+                            element['type']['name'] ==
+                                currentItem['type']['name'])
+                        .toList();
+
+                    if (startIndex != null &&
+                        startIndex['free'] >= 0 &&
+                        startIndex['free'] < filteredItems.length) {
+                      List sublist2 = filteredItems.sublist(startIndex['free']);
+                      totalPrice = sublist2
+                          .where((item) => item['name'] == currentItem['name'])
+                          .fold(0.0,
+                              (double sum, item) => sum + (item['price'] ?? 0));
+                    } else {
+                      totalPrice = 0;
+                    }
+                  } else if (currentItem['price'] != null) {
+                    totalPrice = currentItem['price'].toDouble() ?? 0;
+                  } else {
+                    totalPrice = 0;
+                  }
+
+                  Map<String, dynamic> addonInfo = {
+                    "_id": currentItem['_id'],
+                    "name": currentItem['name'],
+                    "total": totalPrice,
+                    "count": count,
+                    "pu": currentItem['price'] ?? 0,
+                  };
+                  bool entryExists = addons.any((element) =>
                       element['name'] == currentItem['name'] &&
-                      element['price'] == currentItem['price'])
-                  .length;
-              final itemType = currentItem['type'];
-              double totalPrice = 0.0;
-
-              if (itemType != null) {
-                final startIndex = product['plat']['rules'].firstWhere(
-                    (type) => type['type']['name'] == itemType['name'],
-                    orElse: () => null);
-                List filteredItems = product['addons']
-                    .where((element) =>
-                        element['type'] != null &&
-                        element['type']['name'] == currentItem['type']['name'])
-                    .toList();
-
-                if (startIndex != null &&
-                    startIndex['free'] >= 0 &&
-                    startIndex['free'] < filteredItems.length) {
-                  List sublist2 = filteredItems.sublist(startIndex['free']);
-                  totalPrice = sublist2
-                      .where((item) => item['name'] == currentItem['name'])
-                      .fold(0.0,
-                          (double sum, item) => sum + (item['price'] ?? 0));
-                } else {
-                  totalPrice = 0;
-                }
-              } else if (currentItem['price'] != null) {
-                totalPrice = currentItem['price'].toDouble() ?? 0;
-              } else {
-                totalPrice = 0;
+                      element['total'] == totalPrice);
+                  if (!entryExists) {
+                    addons.add(addonInfo);
+                  }
+                });
+                product['extras'].asMap().entries.forEach((entry) {
+                  final int index = entry.key;
+                  final Map<String, dynamic> currentItem = entry.value;
+                  final int count = product['extras']
+                      .where((element) => element == product['extras'][index])
+                      .length;
+                  double price = 0;
+                  if (currentItem['price'] != null) {
+                    price = currentItem['price'].toDouble();
+                  }
+                  Map<String, dynamic> extraInfo = {
+                    "_id": currentItem['_id'],
+                    "name": currentItem['name'],
+                    "total": price * count,
+                    "count": count,
+                    "pu": price,
+                  };
+                  bool entryExists = extras.any((element) =>
+                      element['name'] == currentItem['name'] &&
+                      element['total'] == price * count);
+                  if (!entryExists) {
+                    extras.add(extraInfo);
+                  }
+                });
+                product['addons'] = addons;
+                addons = [];
+                product['extras'] = extras;
+                extras = [];
               }
-
-              Map<String, dynamic> addonInfo = {
-                "_id": currentItem['_id'],
-                "name": currentItem['name'],
-                "total": totalPrice,
-                "count": count,
-                "pu": currentItem['price'] ?? 0,
-              };
-              bool entryExists = addons.any((element) =>
-                  element['name'] == currentItem['name'] &&
-                  element['total'] == totalPrice);
-              if (!entryExists) {
-                addons.add(addonInfo);
-              }
-            });
-            product['extras'].asMap().entries.forEach((entry) {
-              final int index = entry.key;
-              final Map<String, dynamic> currentItem = entry.value;
-              final int count = product['extras']
-                  .where((element) => element == product['extras'][index])
-                  .length;
-              double price = 0;
-              if (currentItem['price'] != null) {
-                price = currentItem['price'].toDouble();
-              }
-              Map<String, dynamic> extraInfo = {
-                "_id": currentItem['_id'],
-                "name": currentItem['name'],
-                "total": price * count,
-                "count": count,
-                "pu": price,
-              };
-              bool entryExists = extras.any((element) =>
-                  element['name'] == currentItem['name'] &&
-                  element['total'] == price * count);
-              if (!entryExists) {
-                extras.add(extraInfo);
-              }
-            });
-            product['addons'] = addons;
-            addons = [];
-            product['extras'] = extras;
-            extras = [];
-          });
-          List<dynamic> productsHistory = products
-              .map((product) => {
-                    'plat': {
-                      "_id": product['plat']['_id'],
-                      "name": product['plat']['name'],
-                      "price": product['plat']['price'],
-                      "currency": product['plat']['currency'],
-                    },
-                    'addons': product['addons'],
-                    'extras': product['extras']
-                  })
-              .toList();
-
-          setState(() {
-            isLoading = true;
-          });
-          String transformToJsonToText(List data) {
-            StringBuffer text = StringBuffer();
-            text.write("[align: center][font: a]");
-            text.write(
-                "[image: url https://i.pinimg.com/236x/1c/e4/e7/1ce4e72b3569b59d066d2a69ddbd2934.jpg; width 40%;min-width 25mm]");
-            text.write("[magnify: width 3; height 1]");
-            text.write("[align: middle]Reçu\n");
-            text.write("[magnify]");
-            text.write("\n");
-            text.write("[column: left:  Name;     right: PU        TOT]");
-            text.write("--------------------------------\n");
-            int entryIndex = 0;
-            int totalEntries = data.length;
-            for (var entry in data) {
-              entryIndex++;
-              text.write(
-                  "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]\n");
-              if (entry['addons'].isNotEmpty) {
+              List<dynamic> productsHistory = products
+                  .map((product) => {
+                        'plat': {
+                          "_id": product['plat']['_id'],
+                          "category": product['plat']['category'],
+                          "name": product['plat']['name'],
+                          "price": product['plat']['price'],
+                          "currency": product['plat']['currency'],
+                        },
+                        'addons': product['addons'],
+                        'extras': product['extras']
+                      })
+                  .toList();
+              String transformToJsonToText(List data) {
+                StringBuffer text = StringBuffer();
+                text.write("[align: center][font: a]");
+                text.write(
+                    "[image: url https://i.pinimg.com/236x/1c/e4/e7/1ce4e72b3569b59d066d2a69ddbd2934.jpg; width 40%;min-width 25mm]");
+                text.write("[magnify: width 3; height 1]");
+                text.write("[align: middle]Reçu\n");
+                text.write("[magnify]");
                 text.write("\n");
-                for (var addon in entry['addons']) {
-                  text.write(
-                      "[column: left: X${addon['count']} ${addon['name']};      right: ${addon['total'] == 0 ? '' : addon['pu']}        ${addon['total'] == 0 ? '--' : addon['total']}]\n");
-                }
-              }
-              if (entry['extras'].isNotEmpty) {
-                text.write("[align: middle][bold: on]Extras[bold: off]");
-                for (var extra in entry['extras']) {
-                  text.write(
-                      "[column: left: X${extra['count']} ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]\n");
-                }
-              }
-              if (entryIndex < totalEntries) {
+                text.write(
+                    "[bold: on][column: left:  Name;     right: PU        TOT][bold]");
                 text.write("--------------------------------\n");
+                int entryIndex = 0;
+                int totalEntries = data.length;
+                for (var entry in data) {
+                  entryIndex++;
+                  text.write(
+                      "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]\n");
+                  if (entry['addons'].isNotEmpty) {
+                    text.write("\n");
+                    for (var addon in entry['addons']) {
+                      text.write(
+                          "[column: left: X${addon['count']} ${addon['name']};      right: ${addon['total'] == 0 ? '' : addon['pu']}        ${addon['total'] == 0 ? '--' : addon['total']}]\n");
+                    }
+                  }
+                  if (entry['extras'].isNotEmpty) {
+                    text.write("[align: middle][bold: on]Extras[bold: off]");
+                    for (var extra in entry['extras']) {
+                      text.write(
+                          "[column: left: X${extra['count']} ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]");
+                    }
+                  }
+                  if (entryIndex < totalEntries) {
+                    text.write("\n--------------------------------\n");
+                  }
+                }
+                text.write("________________________________");
+                text.write("\n\n");
+                text.write("[align: center]");
+                text.write("[magnify: width 2; height 1]");
+                text.write(
+                    "[bold: on]Total : $confirmationTotal $currency [bold]");
+                text.write("\n\n");
+                text.write("[magnify]");
+                text.write("[barcode: type code39; data ABC123 ;module 0;hri]");
+                text.write("[align middle]");
+                text.write("Merci et à la prochaine!");
+                text.write("[cut: feed; partial]");
+                return text.toString();
+              }
+
+              String formattedText = transformToJsonToText(productsHistory);
+              Printer printer = Printer();
+              errorMessage = await printer
+                  .billPrinter(formattedText)
+                  .whenComplete(() => setState(() {
+                        isLoading = false;
+                      }));
+              if (errorMessage == "success") {
+                Provider.of<Categories>(context, listen: false).setStepIndex(0);
+                Provider.of<Categories>(context, listen: false)
+                    .setLastStepIndex(0);
+                Provider.of<Categories>(context, listen: false).setNbSteps(5);
+                Provider.of<Categories>(context, listen: false)
+                    .removeAllProducts();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PaiementScreen()));
+                Histories histories = Histories();
+                errorMessage = await histories.addHistory(productsHistory,
+                    formule, confirmationTotal.toString() + currency);
+              } else {
+                showDialog(
+                    context: context,
+                    builder: ((context) {
+                      return ErrorPopUp("Alert", errorMessage);
+                    }));
               }
             }
-            // text.write("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
-            text.write("________________________________");
-            text.write("[align: center]");
-            text.write("[magnify: width 2; height 1]");
-            text.write("[bold: on]Total : $confirmationTotal $currency [bold]");
-            text.write("[magnify]");
-            text.write("[barcode: type code39; data ABC123 ;module 0;hri]");
-            text.write("[align middle]");
-            text.write("Merci et à la prochaine!");
-            text.write("[cut: feed; partial]");
-            return text.toString();
-          }
-
-          String formattedText = transformToJsonToText(productsHistory);
-          Printer printer = Printer();
-          errorMessage = await printer
-              .billPrinter(formattedText)
-              .whenComplete(() => setState(() {
-                    isLoading = false;
-                  }));
-          // if (errorMessage == "success") {
-          //   Provider.of<Categories>(context, listen: false).setStepIndex(0);
-          //   Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
-          //   Provider.of<Categories>(context, listen: false).setNbSteps(5);
-          //   Provider.of<Categories>(context, listen: false).removeAllProducts();
-          //   Navigator.push(context,
-          //       MaterialPageRoute(builder: (context) => PaiementScreen()));
-          // } else {
-          //   print(errorMessage);
-          //   showDialog(
-          //       context: context,
-          //       builder: ((context) {
-          //         return ErrorPopUp("Alert", errorMessage);
-          //       }));
-          // }
-          // Histories histories = Histories();
-          // errorMessage = await histories
-          //     .addHistory(productsHistory, formule,
-          //         confirmationTotal.toString() + currency)
-          //     .whenComplete(() => setState(() {
-          //           isLoading = false;
-          //         }));
-          // if (errorMessage == "success") {
-          //   Provider.of<Categories>(context, listen: false).setStepIndex(0);
-          //   Provider.of<Categories>(context, listen: false).setLastStepIndex(0);
-          //   Provider.of<Categories>(context, listen: false).setNbSteps(5);
-          //   Provider.of<Categories>(context, listen: false).removeAllProducts();
-          //   Navigator.push(context,
-          //       MaterialPageRoute(builder: (context) => PaiementScreen()));
-          // } else {
-          //   showDialog(
-          //       context: context,
-          //       builder: ((context) {
-          //         return ErrorPopUp("Alert", errorMessage);
-          //       }));
-          // }
-        }
-      }, () {
-        if (products.isEmpty) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CategoryScreen()));
-          Provider.of<Categories>(context, listen: false).setStepIndex(0);
-        } else if (lastProduct == products.last) {
-          Provider.of<Categories>(context, listen: false).removeLastProduct();
-          Provider.of<Categories>(context, listen: false)
-              .setStepIndex(stepIndex - 1);
-          Navigator.of(context).pop();
-        } else {
-          Provider.of<Categories>(context, listen: false)
-              .setStepIndex(stepIndex - 1);
-          Navigator.of(context).pop();
-        }
-      }, isLoading),
+          }, () {
+            if (products.isEmpty) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CategoryScreen()));
+              Provider.of<Categories>(context, listen: false).setStepIndex(0);
+            } else if (lastProduct == products.last) {
+              Provider.of<Categories>(context, listen: false)
+                  .removeLastProduct();
+              Provider.of<Categories>(context, listen: false)
+                  .setStepIndex(stepIndex - 1);
+              Navigator.of(context).pop();
+            } else {
+              Provider.of<Categories>(context, listen: false)
+                  .setStepIndex(stepIndex - 1);
+              Navigator.of(context).pop();
+            }
+          }),
+        ),
+        if (isLoading)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.5),
+              child: Center(
+                child: LoadingAnimationWidget.inkDrop(
+                    color: primaryColor, size: 25.w),
+              ),
+            ),
+          ),
+      ])),
     );
   }
 }

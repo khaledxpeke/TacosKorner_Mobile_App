@@ -20,7 +20,7 @@ class Deserts with ChangeNotifier {
         notifyListeners();
         return "success";
       } else {
-        return body['message'];
+        return "Une erreur est survenue";
       }
     } on SocketException {
       return "Impossible d'accéder à Internet!";
