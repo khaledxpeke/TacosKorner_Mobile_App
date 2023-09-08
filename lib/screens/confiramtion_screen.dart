@@ -181,7 +181,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                             () {
                                               setState(() {
                                                 if (selectedAddon['price'] !=
-                                                    "Free") {
+                                                    "Gratuit") {
                                                   confirmationTotal -=
                                                       selectedAddon['price'] ??
                                                           0.0;
@@ -206,7 +206,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                             () {
                                               setState(() {
                                                 if (selectedExtra['price'] !=
-                                                    "Free") {
+                                                    "Gratuit") {
                                                   confirmationTotal -=
                                                       selectedExtra['price'];
                                                 }
