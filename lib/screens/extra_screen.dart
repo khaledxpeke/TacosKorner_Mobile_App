@@ -243,7 +243,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
         Provider.of<Categories>(context, listen: false)
             .setStepIndex(stepIndex - 1);
         Navigator.of(context).pop();
-      }, false),
+      }),
     );
   }
 }

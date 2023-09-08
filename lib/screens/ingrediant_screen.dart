@@ -351,7 +351,7 @@ class _IngrediantScreenState extends State<IngrediantScreen> {
         } else {
           Navigator.of(context).pop();
         }
-      }, false),
+      }),
     );
   }
 }

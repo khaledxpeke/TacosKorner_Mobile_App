@@ -16,11 +16,11 @@ class Histories {
         "pack": pack,
         "total": total
       });
-      final body = json.decode(response.body);
+      // final body = json.decode(response.body);
       if (response.statusCode == 201) {
         return "success";
       } else {
-        return body['message'];
+        return "Une erreur est survenue";
       }
     } on SocketException{
       return "Impossible d'accéder à Internet!";

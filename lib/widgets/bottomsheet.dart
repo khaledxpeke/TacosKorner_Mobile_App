@@ -7,8 +7,8 @@ import 'package:takos_korner/utils/colors.dart';
 
 import '../provider/categoriesProvider.dart';
 
-Widget bottomsheet(BuildContext context, VoidCallback onNext,
-    VoidCallback onRetour, bool isLoading) {
+Widget bottomsheet(
+    BuildContext context, VoidCallback onNext, VoidCallback onRetour) {
   int stepIndex = Provider.of<Categories>(context).stepIndex;
   int nbSteps = Provider.of<Categories>(context).nbSteps;
   return Container(
@@ -46,31 +46,27 @@ Widget bottomsheet(BuildContext context, VoidCallback onNext,
                       ),
                     ),
                   ))),
-          isLoading
-              ? CircularProgressIndicator(
-                  color: lightColor,
-                )
-              : TextButton(
-                  onPressed: onNext,
-                  child: Text(
-                    stepIndex == nbSteps - 1 ? "PAYER" : "SUIVANT",
-                    style: TextStyle(
-                        color: lightColor,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w800),
+          TextButton(
+              onPressed: onNext,
+              child: Text(
+                stepIndex == nbSteps - 1 ? "PAYER" : "SUIVANT",
+                style: TextStyle(
+                    color: lightColor,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w800),
+              ),
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    stepIndex == nbSteps - 1 ? greenColor : primaryColor,
                   ),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        stepIndex == nbSteps - 1 ? greenColor : primaryColor,
-                      ),
-                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
-                      ),
-                      shape: MaterialStateProperty.all<OutlinedBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                      )))
+                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                    EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+                  ),
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                  )))
         ],
       ),
     ),
