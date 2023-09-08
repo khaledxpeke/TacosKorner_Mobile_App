@@ -410,7 +410,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           String transformToJsonToText(List data) {
             StringBuffer text = StringBuffer();
             text.write("[align: center][font: a]");
-            text.write("[image: url https://star-emea.com/wp-content/uploads/2015/01/logo.jpg; width 40%;min-width 25mm]");
+            text.write(
+                "[image: url https://i.pinimg.com/236x/1c/e4/e7/1ce4e72b3569b59d066d2a69ddbd2934.jpg; width 40%;min-width 25mm]");
             text.write("[magnify: width 3; height 1]");
             text.write("[align: middle]Reçu\n");
             text.write("[magnify]");
