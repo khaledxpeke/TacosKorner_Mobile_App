@@ -2,8 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:takos_korner/provider/history.dart';
 import 'package:takos_korner/provider/printerProvider.dart';
 import 'package:takos_korner/screens/category_screen.dart';
@@ -312,9 +314,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         "Alert", "veuillez sélectionner un produit d'abord");
                   }));
             } else {
-              setState(() {
-                isLoading = true;
-              });
+              // setState(() {
+              //   isLoading = true;
+              // });
               List<Map<String, dynamic>> addons = [];
               List<Map<String, dynamic>> extras = [];
               for (var product in products) {
@@ -412,15 +414,21 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         'extras': product['extras']
                       })
                   .toList();
+              int commandNumber = await getCommandNumber();
+              print(commandNumber);
               String transformToJsonToText(List data) {
                 StringBuffer text = StringBuffer();
                 text.write("[align: center][font: a]");
                 text.write(
                     "[image: url https://i.pinimg.com/236x/1c/e4/e7/1ce4e72b3569b59d066d2a69ddbd2934.jpg; width 40%;min-width 25mm]");
                 text.write("[magnify: width 3; height 1]");
-                text.write("[align: middle]Reçu\n");
+                text.write("[align: middle]Reçu\n\n");
                 text.write("[magnify]");
-                text.write("\n");
+                text.write("[magnify: width 2; height 1]");
+                text.write("Commande N°$commandNumber\n\n");
+                text.write("[magnify]");
+                text.write(formule);
+                text.write("\n\n");
                 text.write(
                     "[bold: on][column: left:  Name;     right: PU        TOT][bold]");
                 text.write("--------------------------------\n");
@@ -463,32 +471,32 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 return text.toString();
               }
 
-              String formattedText = transformToJsonToText(productsHistory);
-              Printer printer = Printer();
-              errorMessage = await printer
-                  .billPrinter(formattedText)
-                  .whenComplete(() => setState(() {
-                        isLoading = false;
-                      }));
-              if (errorMessage == "success") {
-                Provider.of<Categories>(context, listen: false).setStepIndex(0);
-                Provider.of<Categories>(context, listen: false)
-                    .setLastStepIndex(0);
-                Provider.of<Categories>(context, listen: false).setNbSteps(5);
-                Provider.of<Categories>(context, listen: false)
-                    .removeAllProducts();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PaiementScreen()));
-                Histories histories = Histories();
-                errorMessage = await histories.addHistory(productsHistory,
-                    formule, confirmationTotal.toString() + currency);
-              } else {
-                showDialog(
-                    context: context,
-                    builder: ((context) {
-                      return ErrorPopUp("Alert", errorMessage);
-                    }));
-              }
+              // String formattedText = transformToJsonToText(productsHistory);
+              // Printer printer = Printer();
+              // errorMessage = await printer
+              //     .billPrinter(formattedText)
+              //     .whenComplete(() => setState(() {
+              //           isLoading = false;
+              //         }));
+              // if (errorMessage == "success") {
+              //   Provider.of<Categories>(context, listen: false).setStepIndex(0);
+              //   Provider.of<Categories>(context, listen: false)
+              //       .setLastStepIndex(0);
+              //   Provider.of<Categories>(context, listen: false).setNbSteps(5);
+              //   Provider.of<Categories>(context, listen: false)
+              //       .removeAllProducts();
+              //   Histories histories = Histories();
+              //   errorMessage = await histories.addHistory(productsHistory,
+              //       formule, confirmationTotal.toString() + currency);
+              //   Navigator.push(context,
+              //       MaterialPageRoute(builder: (context) => PaiementScreen()));
+              // } else {
+              //   showDialog(
+              //       context: context,
+              //       builder: ((context) {
+              //         return ErrorPopUp("Alert", errorMessage);
+              //       }));
+              // }
             }
           }, () {
             if (products.isEmpty) {
@@ -520,5 +528,28 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           ),
       ])),
     );
+  }
+}
+
+Future<int> getCommandNumber() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  DateTime lastDate;
+  if (!prefs.containsKey('last_date')) {
+    lastDate = DateTime.now();
+    await prefs.setString('last_date', DateTime.now().toString());
+  } else {
+    lastDate = DateTime.parse(prefs.getString('last_date') ?? '');
+  }
+  DateTime beginningOfToday =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  // DateTime beginningOfToday = DateTime.parse('2023-09-07 00:00:00.000');
+  if (lastDate.isBefore(beginningOfToday)) {
+    await prefs.setString('last_date', DateTime.now().toString());
+    await prefs.setInt("count", 1);
+    return 1;
+  } else {
+    int count = prefs.getInt("count") ?? 0;
+    await prefs.setInt("count", count+1);
+    return count+1;
   }
 }
