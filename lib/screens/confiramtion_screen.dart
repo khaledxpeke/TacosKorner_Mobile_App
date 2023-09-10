@@ -430,8 +430,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 text.write(formule);
                 text.write("\n\n");
                 text.write(
-                    "[bold: on][column: left:  Name;     right: PU        TOT][bold]");
-                text.write("--------------------------------\n");
+                    "[bold: on][column: left:  Nom;     right: PU        TOT][bold]");
+                text.write("------------------------------------------------\n");
                 int entryIndex = 0;
                 int totalEntries = data.length;
                 for (var entry in data) {
@@ -449,14 +449,14 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     text.write("[align: middle][bold: on]Extras[bold: off]");
                     for (var extra in entry['extras']) {
                       text.write(
-                          "[column: left: X${extra['count']} ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]");
+                          "[column: left: X${extra['count']} ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]\n");
                     }
                   }
                   if (entryIndex < totalEntries) {
-                    text.write("\n--------------------------------\n");
+                    text.write("\n------------------------------------------------\n");
                   }
                 }
-                text.write("________________________________");
+                text.write("______________________________________________");
                 text.write("\n\n");
                 text.write("[align: center]");
                 text.write("[magnify: width 2; height 1]");
@@ -471,32 +471,32 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 return text.toString();
               }
 
-              // String formattedText = transformToJsonToText(productsHistory);
-              // Printer printer = Printer();
-              // errorMessage = await printer
-              //     .billPrinter(formattedText)
-              //     .whenComplete(() => setState(() {
-              //           isLoading = false;
-              //         }));
-              // if (errorMessage == "success") {
-              //   Provider.of<Categories>(context, listen: false).setStepIndex(0);
-              //   Provider.of<Categories>(context, listen: false)
-              //       .setLastStepIndex(0);
-              //   Provider.of<Categories>(context, listen: false).setNbSteps(5);
-              //   Provider.of<Categories>(context, listen: false)
-              //       .removeAllProducts();
-              //   Histories histories = Histories();
-              //   errorMessage = await histories.addHistory(productsHistory,
-              //       formule, confirmationTotal.toString() + currency);
-              //   Navigator.push(context,
-              //       MaterialPageRoute(builder: (context) => PaiementScreen()));
-              // } else {
-              //   showDialog(
-              //       context: context,
-              //       builder: ((context) {
-              //         return ErrorPopUp("Alert", errorMessage);
-              //       }));
-              // }
+              String formattedText = transformToJsonToText(productsHistory);
+              Printer printer = Printer();
+              errorMessage = await printer
+                  .billPrinter(formattedText)
+                  .whenComplete(() => setState(() {
+                        isLoading = false;
+                      }));
+              if (errorMessage == "success") {
+                Provider.of<Categories>(context, listen: false).setStepIndex(0);
+                Provider.of<Categories>(context, listen: false)
+                    .setLastStepIndex(0);
+                Provider.of<Categories>(context, listen: false).setNbSteps(5);
+                Provider.of<Categories>(context, listen: false)
+                    .removeAllProducts();
+                Histories histories = Histories();
+                errorMessage = await histories.addHistory(productsHistory,
+                    formule, confirmationTotal.toString() + currency);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PaiementScreen()));
+              } else {
+                showDialog(
+                    context: context,
+                    builder: ((context) {
+                      return ErrorPopUp("Alert", errorMessage);
+                    }));
+              }
             }
           }, () {
             if (products.isEmpty) {

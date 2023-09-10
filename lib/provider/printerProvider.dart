@@ -14,7 +14,7 @@ class Printer with ChangeNotifier {
     try {
       final response = await http.post(
           Uri.parse(
-              "https://api.starprinter.online/v1/a/layatech/d/ed7ce236/q"),
+              "https://api.starprinter.online/v1/a/layatech/d/35adc8ed/q"),
           headers: headers,
           body: confirmation);
       final body = json.decode(response.body);
