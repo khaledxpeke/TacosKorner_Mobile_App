@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:takos_korner/provider/history.dart';
 import 'package:takos_korner/provider/printerProvider.dart';
 import 'package:takos_korner/screens/category_screen.dart';
@@ -314,9 +313,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         "Alert", "veuillez sélectionner un produit d'abord");
                   }));
             } else {
-              // setState(() {
-              //   isLoading = true;
-              // });
+              setState(() {
+                isLoading = true;
+              });
               List<Map<String, dynamic>> addons = [];
               List<Map<String, dynamic>> extras = [];
               for (var product in products) {
@@ -414,88 +413,104 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         'extras': product['extras']
                       })
                   .toList();
-              int commandNumber = await getCommandNumber();
-              print(commandNumber);
-              String transformToJsonToText(List data) {
-                StringBuffer text = StringBuffer();
-                text.write("[align: center][font: a]");
-                text.write(
-                    "[image: url https://i.pinimg.com/236x/1c/e4/e7/1ce4e72b3569b59d066d2a69ddbd2934.jpg; width 40%;min-width 25mm]");
-                text.write("[magnify: width 3; height 1]");
-                text.write("[align: middle]Reçu\n\n");
-                text.write("[magnify]");
-                text.write("[magnify: width 2; height 1]");
-                text.write("Commande N°$commandNumber\n\n");
-                text.write("[magnify]");
-                text.write(formule);
-                text.write("\n\n");
-                text.write(
-                    "[bold: on][column: left:  Nom;     right: PU        TOT][bold]");
-                text.write("------------------------------------------------\n");
-                int entryIndex = 0;
-                int totalEntries = data.length;
-                for (var entry in data) {
-                  entryIndex++;
-                  text.write(
-                      "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]\n");
-                  if (entry['addons'].isNotEmpty) {
-                    text.write("\n");
-                    for (var addon in entry['addons']) {
-                      text.write(
-                          "[column: left: X${addon['count']} ${addon['name']};      right: ${addon['total'] == 0 ? '' : addon['pu']}        ${addon['total'] == 0 ? '--' : addon['total']}]\n");
-                    }
-                  }
-                  if (entry['extras'].isNotEmpty) {
-                    text.write("[align: middle][bold: on]Extras[bold: off]");
-                    for (var extra in entry['extras']) {
-                      text.write(
-                          "[column: left: X${extra['count']} ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]\n");
-                    }
-                  }
-                  if (entryIndex < totalEntries) {
-                    text.write("\n------------------------------------------------\n");
-                  }
-                }
-                text.write("______________________________________________");
-                text.write("\n\n");
-                text.write("[align: center]");
-                text.write("[magnify: width 2; height 1]");
-                text.write(
-                    "[bold: on]Total : $confirmationTotal $currency [bold]");
-                text.write("\n\n");
-                text.write("[magnify]");
-                text.write("[barcode: type code39; data ABC123 ;module 0;hri]");
-                text.write("[align middle]");
-                text.write("Merci et à la prochaine!");
-                text.write("[cut: feed; partial]");
-                return text.toString();
-              }
-
-              String formattedText = transformToJsonToText(productsHistory);
-              Printer printer = Printer();
-              errorMessage = await printer
-                  .billPrinter(formattedText)
-                  .whenComplete(() => setState(() {
-                        isLoading = false;
-                      }));
-              if (errorMessage == "success") {
-                Provider.of<Categories>(context, listen: false).setStepIndex(0);
-                Provider.of<Categories>(context, listen: false)
-                    .setLastStepIndex(0);
-                Provider.of<Categories>(context, listen: false).setNbSteps(5);
-                Provider.of<Categories>(context, listen: false)
-                    .removeAllProducts();
-                Histories histories = Histories();
-                errorMessage = await histories.addHistory(productsHistory,
-                    formule, confirmationTotal.toString() + currency);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PaiementScreen()));
-              } else {
+              String result = await context.read<Printer>().commandNumber();
+              if (result != "success") {
                 showDialog(
                     context: context,
                     builder: ((context) {
                       return ErrorPopUp("Alert", errorMessage);
                     }));
+              } else {
+                int commandNumb = Provider.of<Printer>(context).commandNumb;
+                String transformToJsonToText(List data) {
+                  StringBuffer text = StringBuffer();
+                  text.write("[align: center][font: a]");
+                  text.write(
+                      "[image: url https://i.pinimg.com/236x/1c/e4/e7/1ce4e72b3569b59d066d2a69ddbd2934.jpg; width 40%;min-width 25mm]");
+                  text.write("[magnify: width 3; height 1]");
+                  text.write("[align: middle]Reçu\n\n");
+                  text.write("[magnify]");
+                  text.write("[magnify: width 3; height 2][font: b]");
+                  text.write("Commande N°$commandNumb[font]\n\n");
+                  text.write("[magnify]");
+                  text.write(formule);
+                  text.write("\n\n");
+                  text.write(
+                      "[bold: on][column: left:  Nom;     right: PU        TOT][bold]");
+                  text.write(
+                      "------------------------------------------------\n");
+                  int entryIndex = 0;
+                  int totalEntries = data.length;
+                  for (var entry in data) {
+                    entryIndex++;
+                    text.write(
+                        "[bold: on][column: left: ${entry['plat']['name']};     right: ${entry['plat']['price']}][bold]\n");
+                    if (entry['addons'].isNotEmpty) {
+                      text.write("\n");
+                      for (var addon in entry['addons']) {
+                        text.write(
+                            "[column: left: X${addon['count']} ${addon['name']};      right: ${addon['total'] == 0 ? '' : addon['pu']}        ${addon['total'] == 0 ? '--' : addon['total']}]\n");
+                      }
+                    }
+                    if (entry['extras'].isNotEmpty) {
+                      text.write("[align: middle][bold: on]Extras[bold: off]");
+                      for (var extra in entry['extras']) {
+                        text.write(
+                            "[column: left: X${extra['count']} ${extra['name']};      right: ${extra['total'] == 0 ? '' : extra['pu']}        ${extra['total'] == 0 ? '--' : extra['total']}]\n");
+                      }
+                    }
+                    if (entryIndex < totalEntries) {
+                      text.write(
+                          "\n------------------------------------------------\n");
+                    }
+                  }
+                  text.write("______________________________________________");
+                  text.write("\n\n");
+                  text.write("[align: center]");
+                  text.write("[magnify: width 2; height 1]");
+                  text.write(
+                      "[bold: on]Total : $confirmationTotal $currency [bold]");
+                  text.write("\n\n");
+                  text.write("[magnify]");
+                  text.write(DateFormat('EEEE y/MM/dd HH:mm').format(DateTime.now()));
+                  text.write("\n\n");
+                  text.write(
+                      "[barcode: type code39; data ABC123 ;module 0;hri]");
+                  text.write("[align middle]");
+                  text.write("Merci et à la prochaine!");
+                  text.write("[cut: feed; partial]");
+                  return text.toString();
+                }
+
+                String formattedText = transformToJsonToText(productsHistory);
+                Printer printer = Printer();
+                errorMessage = await printer
+                    .billPrinter(formattedText)
+                    .whenComplete(() => setState(() {
+                          isLoading = false;
+                        }));
+                if (errorMessage == "success") {
+                  Provider.of<Categories>(context, listen: false)
+                      .setStepIndex(0);
+                  Provider.of<Categories>(context, listen: false)
+                      .setLastStepIndex(0);
+                  Provider.of<Categories>(context, listen: false).setNbSteps(5);
+                  Provider.of<Categories>(context, listen: false)
+                      .removeAllProducts();
+                  Histories histories = Histories();
+                  errorMessage = await histories.addHistory(productsHistory,
+                      formule, confirmationTotal.toString() + currency);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PaiementScreen()));
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: ((context) {
+                        return ErrorPopUp("Alert", errorMessage);
+                      }));
+                }
               }
             }
           }, () {
@@ -528,28 +543,5 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
           ),
       ])),
     );
-  }
-}
-
-Future<int> getCommandNumber() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  DateTime lastDate;
-  if (!prefs.containsKey('last_date')) {
-    lastDate = DateTime.now();
-    await prefs.setString('last_date', DateTime.now().toString());
-  } else {
-    lastDate = DateTime.parse(prefs.getString('last_date') ?? '');
-  }
-  DateTime beginningOfToday =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-  // DateTime beginningOfToday = DateTime.parse('2023-09-07 00:00:00.000');
-  if (lastDate.isBefore(beginningOfToday)) {
-    await prefs.setString('last_date', DateTime.now().toString());
-    await prefs.setInt("count", 1);
-    return 1;
-  } else {
-    int count = prefs.getInt("count") ?? 0;
-    await prefs.setInt("count", count+1);
-    return count+1;
   }
 }
