@@ -17,7 +17,7 @@ class Printer with ChangeNotifier {
     try {
       final response = await http.post(
           Uri.parse(
-              "https://api.starprinter.online/v1/a/layatech/d/35adc8ed/q"),
+              "https://api.starprinter.online/v1/a/layatech/d/ed7ce236/q"),
           headers: headers,
           body: confirmation);
       final body = json.decode(response.body);
@@ -41,7 +41,7 @@ class Printer with ChangeNotifier {
     try {
       final response = await http.post(Uri.parse("$url/history/CommandNumber"));
       final body = json.decode(response.body);
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         commandNumb = body;
         notifyListeners();
         return "success";

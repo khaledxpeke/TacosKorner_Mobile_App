@@ -421,7 +421,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                       return ErrorPopUp("Alert", errorMessage);
                     }));
               } else {
-                int commandNumb = Provider.of<Printer>(context).commandNumb;
+                int commandNumb = Provider.of<Printer>(context,listen: false).commandNumb;
                 String transformToJsonToText(List data) {
                   StringBuffer text = StringBuffer();
                   text.write("[align: center][font: a]");

@@ -10,6 +10,7 @@ import 'package:takos_korner/provider/categoriesProvider.dart';
 import 'package:takos_korner/provider/drinkProvider.dart';
 import 'package:takos_korner/provider/ingrediantProvider.dart';
 import 'package:takos_korner/provider/extraProvider.dart';
+import 'package:takos_korner/provider/printerProvider.dart';
 import 'package:takos_korner/provider/suppelementsProvider.dart';
 import 'package:takos_korner/screens/splash_screen.dart';
 import 'screens/Home_screen.dart';
@@ -27,6 +28,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => Supplements()),
       ChangeNotifierProvider(create: (_) => Extra()),
       ChangeNotifierProvider(create: (_) => Ingredients()),
+      ChangeNotifierProvider(create: (_) => Printer()),
     ],
     child: MyApp(),
   ));
